@@ -24,7 +24,7 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/admin', admin)
-app.use('/user', user)
+app.use('/auth', user)
 app.use('/migrate', function (req, res) {
   require('./src/migrations/Roles')
   require('./src/migrations/User')

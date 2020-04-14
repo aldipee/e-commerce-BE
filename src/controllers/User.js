@@ -41,7 +41,8 @@ module.exports = {
     }
   },
   activateUser: async function (req, res) {
-    const { username, verifyCode } = req.body
+    const { username, verifyCode } = req.query
+    console.log(username, verifyCode)
     if (username && verifyCode) {
       const checkUser = await UserModel.checkUsername(username)
       if (!checkUser) {
@@ -88,6 +89,61 @@ module.exports = {
       }
     } else {
       res.send(message(false, 'Please fill all the input'))
+    }
+  },
+  usernameCheck: async function (req, res) {
+    const { username } = req.body
+    const result = await UserModel.checkUsername(username)
+    if (result) {
+      res.send(message(true, 'Username exists'))
+    } else {
+      res.send(message(false, 'Username not found'))
+    }
+  },
+  forgetPass: async function (req, res) {
+    const { username } = req.body
+    if (username) {
+      if (await UserModel.checkUsername(username)) {
+        const userInfo = await UserModel.getUserByUsername(username)
+        if (userInfo.is_registered === 1) {
+          await UserModel.createVerificationCode(userInfo.id, uuid())
+          const resetCode = await UserModel.getVerificationCode(userInfo.username)
+          if (resetCode) {
+            res.send(message(true, `Reset code : ${resetCode.verification_code}`))
+          } else {
+            res.send(message(false, 'Reset code can\'t generate'))
+          }
+        } else {
+          res.send(message(false, 'active your account first'))
+        }
+      } else {
+        res.send(message(false, 'Username not found'))
+      }
+    } else {
+      res.send(message(false, 'Please enter username and reset code'))
+    }
+  },
+  resetPass: async function (req, res) {
+    const { resetCode } = req.query
+    const { password, confirmPass, username } = req.body
+    if (resetCode && username) {
+      const checkUser = await UserModel.checkUsername(username)
+      if (checkUser) {
+        if (password === confirmPass) {
+          const encryptPass = bcrypt.hashSync(password)
+          if (await UserModel.forgotPassword(resetCode, encryptPass)) {
+            res.send(message(true, 'Password has changed'))
+          } else {
+            res.send(message(false, 'failed to change password'))
+          }
+        } else {
+          res.send(message(false, 'Your new password and confirm password not equal'))
+        }
+      } else {
+        res.send(message(false, 'Username not found'))
+      }
+    } else {
+      res.send(message(false, 'Please enter reset code and username'))
     }
   }
 }

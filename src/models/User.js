@@ -117,8 +117,7 @@ module.exports = {
   },
   forgotPassword: async function (uuid, newPassword) {
     const table = 'users'
-    const query = `SELECT COUNT (*) AS total FROM ${table} WHERE verification_code ='${uuid}' AND is_active=1 AND is_verified=1`
-    console.log(query)
+    const query = `SELECT COUNT (*) AS total FROM ${table} WHERE verification_code ='${uuid}' AND is_registered = 1`
     const checkUser = new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {
@@ -131,6 +130,7 @@ module.exports = {
     if (await checkUser) {
       return new Promise(function (resolve, reject) {
         db.query(`UPDATE ${table} SET password='${newPassword}' WHERE verification_code='${uuid}'`, function (err, results, fields) {
+          console.log('a')
           if (err) {
             reject(err)
           } else {
