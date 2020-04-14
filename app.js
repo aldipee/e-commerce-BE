@@ -30,7 +30,6 @@ app.use('/migrate', function (req, res) {
   require('./src/migrations/User')
   require('./src/migrations/UserDetails')
   require('./src/migrations/Address')
-  console.log('cek')
   res.send('Migrate roles, user, userd, address')
 })
 

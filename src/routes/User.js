@@ -1,8 +1,7 @@
 var express = require('express')
-const user = express.Router()
+const User = express.Router()
+const UserControl = require('../controllers/User')
 
-user.get('/hello', function (req, res) {
-  res.send('hello world')
-})
+User.post('/register', UserControl.registerUser)
 
-module.exports = user
+module.exports = User

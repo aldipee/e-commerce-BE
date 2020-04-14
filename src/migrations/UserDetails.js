@@ -1,4 +1,5 @@
 const db = require('../../utils/db')
+require('dotenv').config()
 
 const query = `CREATE TABLE IF NOT EXISTS user_details(
           id INT PRIMARY KEY AUTO_INCREMENT,
@@ -12,5 +13,5 @@ const query = `CREATE TABLE IF NOT EXISTS user_details(
           updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
           CONSTRAINT user_userdetail FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
           CONSTRAINT unique_user UNIQUE (id_user))`
-
-db.query(query, function () {})
+const insert = `INSERT INTO user_details (id_user, full_name, gender, phone, balance) VALUES (1, '${process.env.ADMIN_NAME}', 1, '${process.env.PHONE}', 10000000000)`
+db.query(query, function () { db.query(insert) })
