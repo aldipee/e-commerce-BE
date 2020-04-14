@@ -80,19 +80,37 @@ module.exports = {
       })
     })
   },
-  checkActivatedUser: function (id) {
+  activateUser: async function (username, code) {
     const table = 'users'
-    const query = `SELECT COUNT (*) AS total FROM ${table} WHERE id = ${id} AND is_active = 1`
+    const checkUser = await this.checkUsername(username)
+    const query = `UPDATE ${table} SET verification_code=${null}, is_registered = 1 WHERE username='${username}' AND verification_code = '${code}'`
+    return new Promise(function (resolve, reject) {
+      if (!checkUser) {
+        resolve(false)
+      } else {
+        db.query(query, function (err, results, fields) {
+          if (err) {
+            reject(err)
+          } else {
+            if (results.affectedRows) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          }
+        })
+      }
+    })
+  },
+  checkRegistered: async function (username) {
+    const table = 'users'
+    const query = `SELECT COUNT (*) AS total from ${table} WHERE username='${username}' AND is_registered = 1`
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {
           reject(err)
         } else {
-          if (results.affectedRows) {
-            resolve(true)
-          } else {
-            resolve(false)
-          }
+          resolve(results[0].total)
         }
       })
     })
