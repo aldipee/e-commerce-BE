@@ -22,13 +22,19 @@ module.exports = {
         res.send(message(false, 'Username already exists'))
       } else {
         const encryptPass = bcrypt.hashSync(password)
-        const resultUser = await UserModel.createUser(username, encryptPass, email)
+        const resultUser = await UserModel.createUser(
+          username,
+          encryptPass,
+          email
+        )
         const infoUser = await UserModel.getUserByUsername(username)
         await UserDetailModel.createUserDetail(infoUser.id, fullname, phone)
         if (resultUser) {
           if (await UserModel.createVerificationCode(infoUser.id, uuid())) {
             const code = await UserModel.getVerificationCode(username)
-            res.send(message(true, `Verification code: ${code.verification_code}`))
+            res.send(
+              message(true, `Verification code: ${code.verification_code}`)
+            )
           } else {
             res.send(message(false, 'Verification code cant be generate'))
           }
@@ -73,7 +79,11 @@ module.exports = {
         const checkRegistered = await UserModel.checkRegistered(username)
         if (checkRegistered) {
           if (checkPassword) {
-            const payload = { id: infoUser.id, username, roleId: infoUser.role_id }
+            const payload = {
+              id: infoUser.id,
+              username,
+              roleId: infoUser.role_id
+            }
             const options = { expiresIn: '15m' }
             const key = process.env.APP_KEY
             const token = jwt.sign(payload, key, options)
