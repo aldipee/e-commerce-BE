@@ -11,6 +11,7 @@ require('dotenv').config()
 // routes
 var user = require('./src/routes/User')
 var admin = require('./src/routes/Admin')
+var product = require('./src/routes/Product')
 
 var app = express()
 
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/item', admin)
 app.use('/auth', user)
+app.use('/product', product)
 app.use('/migrate', function (req, res) {
   require('./src/migrations/Roles')
   require('./src/migrations/User')
@@ -41,6 +43,7 @@ app.use('/migrate', function (req, res) {
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404))
+  res.send('404 not found')
 })
 
 // error handler

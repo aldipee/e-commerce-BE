@@ -13,5 +13,49 @@ module.exports = {
         }
       })
     })
+  },
+  getAllCategory: function () {
+    const query = `SELECT * FROM ${table}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.length) {
+            resolve(results[0])
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
+  },
+  checkCategory: function (id) {
+    const query = `SELECT COUNT (*) AS total FROM ${table} WHERE id = ${id}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results[0].total)
+        }
+      })
+    })
+  },
+  deleteCategory: function (id) {
+    const query = `UPDATE ${table} SET is_deleted = 1 WHERE id = ${id}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.affectedRows) {
+            resolve(results.affectedRows)
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
   }
 }

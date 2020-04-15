@@ -1,5 +1,5 @@
 var express = require('express')
-const admin = express.Router()
+const product = express.Router()
 const multer = require('multer')
 const path = require('path')
 
@@ -47,8 +47,9 @@ function filterPicture (req, res, next) {
     }
   })
 }
-// item
-admin.post('/category', filterPicture, MidToken.checkToken, AdminControl.createCategory)
-admin.patch('/category/:id', MidToken.checkToken, AdminControl.deleteCategory)
 
-module.exports = admin
+// product
+product.post('/create', MidToken.checkToken, filterPicture, AdminControl.createProduct)
+product.post('/create/:idProduct/detail', MidToken.checkToken, AdminControl.createProductDetail)
+
+module.exports = product
