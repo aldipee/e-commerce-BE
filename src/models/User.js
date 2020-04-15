@@ -30,7 +30,7 @@ module.exports = {
   checkEmail: function (email) {
     const table = 'users'
     return new Promise(function (resolve, reject) {
-      const query = `SELECT COUNT (*) AS total FROM ${table} WHERE username ='${email}'`
+      const query = `SELECT COUNT (*) AS total FROM ${table} WHERE email ='${email}'`
       db.query(query, function (err, results, fields) {
         if (err) {
           reject(err)

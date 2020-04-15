@@ -116,6 +116,19 @@ module.exports = {
       res.send(message(false, 'Username not found'))
     }
   },
+  emailCheck: async function (req, res) {
+    const { email } = req.body
+    if (email) {
+      const result = await UserModel.checkEmail(email)
+      if (result === 0) {
+        res.send(message(true, 'Your email can use'))
+      } else {
+        res.send(message(false, 'Email already in use'))
+      }
+    } else {
+      res.send(message(false, 'Please insert email'))
+    }
+  },
   forgetPass: async function (req, res) {
     const { username } = req.body
     if (username) {
