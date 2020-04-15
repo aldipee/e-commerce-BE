@@ -15,23 +15,22 @@ function message (success, msg) {
 
 module.exports = {
   registerUser: async function (req, res) {
-    
-    const { username, password, fullname, email, phone } = req.body
-    if (username && password && fullname && email && phone) {
-      const checkUser = await UserModel.checkUsername(username)
-      if (checkUser !== 0) {
-        res.send(message(false, 'Username already exists'))
-      } else {
-        const encryptPass = bcrypt.hashSync(password)
-        const resultUser = await UserModel.createUser(
-          username,
-          encryptPass,
-          email
-        )
-        const infoUser = await UserModel.getUserByUsername(username)
-        // const checkEmail = await UserModel.checkEmail(email)
-        // console.log(checkEmail)
-        try {
+    try {
+      const { username, password, fullname, email, phone } = req.body
+      if (username && password && fullname && email && phone) {
+        const checkUser = await UserModel.checkUsername(username)
+        if (checkUser !== 0) {
+          res.send(message(false, 'Username already exists'))
+        } else {
+          const encryptPass = bcrypt.hashSync(password)
+          const resultUser = await UserModel.createUser(
+            username,
+            encryptPass,
+            email
+          )
+          const infoUser = await UserModel.getUserByUsername(username)
+          // const checkEmail = await UserModel.checkEmail(email)
+          // console.log(checkEmail)
           await UserDetailModel.createUserDetail(infoUser.id, fullname, phone)
           if (resultUser) {
             if (await UserModel.createVerificationCode(infoUser.id, uuid())) {
@@ -45,13 +44,12 @@ module.exports = {
           } else {
             res.send(message(false, 'Register failed'))
           }
-        } catch (err) {
-          console.log(err)
-          res.send(message(false, err))
         }
+      } else {
+        res.send(message(false, 'Please fill all input'))
       }
-    } else {
-      res.send(message(false, 'Please fill all input'))
+    } catch (err) {
+      res.send(message(false, err.sqlMessage))
     }
   },
   activateUser: async function (req, res) {
