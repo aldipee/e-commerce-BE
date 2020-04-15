@@ -7,7 +7,7 @@ const db = require('../../utils/db')
 const query = `CREATE TABLE IF NOT EXISTS users (
   id INT PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(50) NOT NULL,
-  password VARCHAR(50) NOT NULL,
+  password VARCHAR(250) NOT NULL,
   email VARCHAR(50) NOT NULL,
   is_registered TINYINT(1) DEFAULT 0,
   is_deleted TINYINT(1) DEFAULT 0,

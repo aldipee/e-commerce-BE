@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/admin', admin)
+app.use('/item', admin)
 app.use('/auth', user)
 app.use('/migrate', function (req, res) {
   require('./src/migrations/Roles')
@@ -33,6 +33,8 @@ app.use('/migrate', function (req, res) {
   require('./src/migrations/Category')
   require('./src/migrations/Products')
   require('./src/migrations/ProductDetails')
+  require('./src/migrations/Transactions')
+  require('./src/migrations/TransactionDetails')
   res.send('Migrate roles, user, userd, address')
 })
 
