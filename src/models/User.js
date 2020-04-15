@@ -27,6 +27,19 @@ module.exports = {
       })
     })
   },
+  checkEmail: function (email) {
+    const table = 'users'
+    return new Promise(function (resolve, reject) {
+      const query = `SELECT COUNT (*) AS total FROM ${table} WHERE username ='${email}'`
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results[0].total)
+        }
+      })
+    })
+  },
   getUserByUsername: function (username) {
     const table = 'users'
     return new Promise(function (resolve, reject) {

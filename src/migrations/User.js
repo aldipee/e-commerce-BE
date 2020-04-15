@@ -1,4 +1,8 @@
 require('dotenv').config()
+const bcrypt = require('bcryptjs')
+password = process.env.PASSWORD
+const encryptPass = bcrypt.hashSync(password)
+
 const db = require('../../utils/db')
 const query = `CREATE TABLE IF NOT EXISTS users (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -12,9 +16,10 @@ const query = `CREATE TABLE IF NOT EXISTS users (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE  KEY unique_username (username),
+  UNIQUE  KEY unique_email (email),
   CONSTRAINT role_user FOREIGN KEY(role_id) REFERENCES roles(id) ON DELETE NO ACTION ON UPDATE NO ACTION)`
 
-const queryInsert = `INSERT INTO users (username,password,email, is_registered, role_id) VALUES ('${process.env.USER_ADMIN}','${process.env.PASSWORD}','admin@gmail.com',1,1);`
+const queryInsert = `INSERT INTO users (username,password,email, is_registered, role_id) VALUES ('${process.env.USER_ADMIN}','${encryptPass}','admin@gmail.com',1,1);`
 db.query(query, function () {
   db.query(queryInsert)
 })

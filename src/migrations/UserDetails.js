@@ -9,6 +9,7 @@ const query = `CREATE TABLE IF NOT EXISTS user_details(
           gender TINYINT(1) ,
           phone VARCHAR(60) NOT NULL,
           balance INT DEFAULT 0,
+          photo TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
           CONSTRAINT user_userdetail FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,

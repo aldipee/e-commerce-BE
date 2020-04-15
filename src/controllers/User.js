@@ -15,6 +15,7 @@ function message (success, msg) {
 
 module.exports = {
   registerUser: async function (req, res) {
+    
     const { username, password, fullname, email, phone } = req.body
     if (username && password && fullname && email && phone) {
       const checkUser = await UserModel.checkUsername(username)
@@ -28,18 +29,25 @@ module.exports = {
           email
         )
         const infoUser = await UserModel.getUserByUsername(username)
-        await UserDetailModel.createUserDetail(infoUser.id, fullname, phone)
-        if (resultUser) {
-          if (await UserModel.createVerificationCode(infoUser.id, uuid())) {
-            const code = await UserModel.getVerificationCode(username)
-            res.send(
-              message(true, `Verification code: ${code.verification_code}`)
-            )
+        // const checkEmail = await UserModel.checkEmail(email)
+        // console.log(checkEmail)
+        try {
+          await UserDetailModel.createUserDetail(infoUser.id, fullname, phone)
+          if (resultUser) {
+            if (await UserModel.createVerificationCode(infoUser.id, uuid())) {
+              const code = await UserModel.getVerificationCode(username)
+              res.send(
+                message(true, `Verification code: ${code.verification_code}`)
+              )
+            } else {
+              res.send(message(false, 'Verification code cant be generate'))
+            }
           } else {
-            res.send(message(false, 'Verification code cant be generate'))
+            res.send(message(false, 'Register failed'))
           }
-        } else {
-          res.send(message(false, 'Register failed'))
+        } catch (err) {
+          console.log(err)
+          res.send(message(false, err))
         }
       }
     } else {
