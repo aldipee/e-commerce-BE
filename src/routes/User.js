@@ -56,7 +56,7 @@ User.post('/username-check', UserControl.usernameCheck)
 User.post('/forgot', UserControl.forgetPass)
 User.post('/reset-password', UserControl.resetPass)
 User.post('/email-check', UserControl.emailCheck)
-User.post('/add-address', MidToken.checkToken, UserControl.addAddress)
+User.post('/insert-address', MidToken.checkToken, UserControl.addAddress)
 
 User.patch('/update-profile', MidToken.checkToken, filterPicture, UserControl.updateProfile)
 
