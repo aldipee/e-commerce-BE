@@ -53,6 +53,6 @@ function filterPicture (req, res, next) {
 product.post('/create', MidToken.checkToken, filterPicture, AdminControl.createProduct)
 product.post('/create/:idProduct/detail', MidToken.checkToken, AdminControl.createProductDetail)
 
-product.get('/all', MidToken.checkToken, UserControl.getAllProduct)
+product.get('/all', UserControl.getAllProduct)
 
 module.exports = product

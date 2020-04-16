@@ -49,12 +49,12 @@ module.exports = {
   },
   createProduct: async function (req, res) {
     if (req.user.roleId === 1) {
-      const { idCategory, name, price } = req.body
+      const { idCategory, name, price, stock } = req.body
       const picture = (req.file && req.file.filename) || null
       if (idCategory && name && price) {
         const result = await CategoryModel.checkCategory(idCategory)
         if (result === 1) {
-          await ProductModel.createProduct(idCategory, name, picture, price)
+          await ProductModel.createProduct(idCategory, name, picture, price, stock)
           res.send(message(true, 'Product created'))
         } else {
           res.send(message(false, 'id category not found'))
