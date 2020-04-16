@@ -13,5 +13,21 @@ module.exports = {
         }
       })
     })
+  },
+  updateStatus: function (id, status) {
+    const query = `UPDATE ${table} SET status = ${status} WHERE id=${id}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.affectedRows) {
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
   }
 }

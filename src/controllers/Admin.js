@@ -1,6 +1,7 @@
 const CategoryModel = require('../models/Categories')
 const ProductModel = require('../models/Products')
 const ProductDetail = require('../models/ProductDetails')
+const TransactionModel = require('../models/Transaction')
 function message (value, message) {
   const data = {
     true: value,
@@ -81,6 +82,17 @@ module.exports = {
       } else {
         res.send(message(false, 'Please fill all input'))
       }
+    } else {
+      res.send(message(false, 'U cant access this feature'))
+    }
+  },
+  updateTransactionDetail: async function (req, res) {
+    const { id } = req.params
+    const { status } = req.body
+    const role = req.user.roleId
+    if (role === 1) {
+      await TransactionModel.updateStatus(id, status)
+      res.send(message(true, 'Transaction status updated'))
     } else {
       res.send(message(false, 'U cant access this feature'))
     }

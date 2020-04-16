@@ -51,4 +51,5 @@ function filterPicture (req, res, next) {
 admin.post('/category', filterPicture, MidToken.checkToken, AdminControl.createCategory)
 admin.patch('/category/:id', MidToken.checkToken, AdminControl.deleteCategory)
 
+
 module.exports = admin
