@@ -248,10 +248,9 @@ module.exports = {
     page = parseInt(page) || 1
     limit = parseInt(limit) || 5
 
-    let key = search && Object.keys(search)[0]
-    let value = search && Object.values(search)[0]
-    search = (search && { key, value }) || { key: 'name', value: '' }
-
+    // let key = search && Object.keys(search)[0]
+    // let value = search && Object.values(search)[0]
+    search = (search && { key: search.key, value: search.value }) || { key: 'name', value: '' }
     key = sort && Object.keys(sort)[0]
     value = sort && Object.values(sort)[0]
     sort = (sort && { key, value }) || { key: 'price', value: 1 }
