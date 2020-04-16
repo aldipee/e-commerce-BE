@@ -59,8 +59,8 @@ module.exports = {
       })
     })
   },
-  checkStock: function (idProduct, size) {
-    const query = `SELECT * FROM ${table} JOIN product_details ON products.id = product_details.id_product WHERE products.id=${idProduct} AND size = ${size}`
+  checkStock: function (idProduct) {
+    const query = `SELECT * FROM ${table} WHERE id=${idProduct}`
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {
