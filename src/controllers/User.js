@@ -220,19 +220,17 @@ module.exports = {
       res.send(message(false, 'Please fill the all input'))
     }
   },
-  // createTransaction: async function (req, res) {
-  //   try {
-  //     const id = req.user.id
-  //     const { totalPrice, postalFee, Product } = req.body
-  //     const infoTransaction = await TransactionModel.createTransaction(id, totalPrice, postalFee)
-  //     console.log(infoTransaction)
-  //     // for (let i = 0; i <= Product.length; i++) {
-  //     //   await TransactionDetailModel.createTransactionDetails(infoTransaction.id)
-  //     // }
-  //   } catch (err) {
-  //     res.send(err)
-  //   }
-  // },
+  createTransaction: async function (req, res) {
+    const id = req.user.id
+    const { totalPrice, postalFee, Product } = req.body
+    const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee)
+    for (let i = 0; i <= Product.length; i++) {
+      await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].id, 800000, Product[i].quantity)
+      console.log(Product[i].id)
+      await ProductModel.buy(Product[i].quantity, Product[i].id)
+    }
+    res.send(true, 'Transaction success')
+  },
   getAllProduct: async function (req, res) {
     let { page, limit, search, sort } = req.query
     page = parseInt(page) || 1
@@ -241,8 +239,8 @@ module.exports = {
     // let key = search && Object.keys(search)[0]
     // let value = search && Object.values(search)[0]
     search = (search && { key: search.key, value: search.value }) || { key: 'name', value: '' }
-    const key = sort && Object.keys(sort)[0]
-    const value = sort && Object.values(sort)[0]
+    // const key = sort && Object.keys(sort)[0]
+    // const value = sort && Object.values(sort)[0]
     sort = (sort && { key, value }) || { key: 'price', value: 1 }
     const conditions = { page, perPage: limit, search, sort }
     const results = await ProductModel.getAllProducts(conditions)
