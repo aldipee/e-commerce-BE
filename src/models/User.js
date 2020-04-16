@@ -61,7 +61,6 @@ module.exports = {
   createVerificationCode: function (id, vercode) {
     const table = 'users'
     const query = `UPDATE ${table} SET verification_code = '${vercode}' WHERE id = ${id}`
-    console.log(query)
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {

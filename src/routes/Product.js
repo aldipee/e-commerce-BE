@@ -5,6 +5,7 @@ const path = require('path')
 
 const MidToken = require('../middleware/Auth')
 const AdminControl = require('../controllers/Admin')
+const UserControl = require('../controllers/User')
 
 const storage = multer.diskStorage({
   destination: 'files/',
@@ -51,5 +52,7 @@ function filterPicture (req, res, next) {
 // product
 product.post('/create', MidToken.checkToken, filterPicture, AdminControl.createProduct)
 product.post('/create/:idProduct/detail', MidToken.checkToken, AdminControl.createProductDetail)
+
+product.get('/all', MidToken.checkToken, UserControl.getAllProduct)
 
 module.exports = product

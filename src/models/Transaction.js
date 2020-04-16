@@ -1,8 +1,9 @@
 const db = require('../../utils/db')
-const table = 'address'
+const table = 'transactions'
+
 module.exports = {
-  createAddress: function (idUserDetail, city, postcode, district, street) {
-    const query = `INSERT INTO ${table} (id_user_detail, city, postcode, street, district) VALUES (${idUserDetail}, '${city}', '${postcode}', '${street}', '${district}')`
+  createTransaction: function (idUser, totalPrice, postalFee) {
+    const query = `INSERT INTO ${table} (id_user, total_price, postal_fee) VALUES (${idUser}, ${totalPrice}, ${postalFee}) `
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {

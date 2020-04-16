@@ -4,13 +4,25 @@ const uuid = require('uuid').v4
 
 const UserModel = require('../models/User')
 const UserDetailModel = require('../models/UserDetail')
+const TransactionModel = require('../models/Transaction')
+const TransactionDetailModel = require('../models/TransactionDetails')
+const ProductModel = require('../models/Products')
+const ProductDetailModel = require('../models/ProductDetails')
+const AddressModel = require('../models/Address')
 
-function message (success, msg) {
-  const data = {
-    success: success,
-    msg: msg
+function message (success, msg, data) { 
+  if (data) {
+    return {
+      success: success,
+      msg: msg,
+      data: data
+    }
+  } else {
+    return {
+      success: success,
+      msg: msg
+    }
   }
-  return data
 }
 
 module.exports = {
@@ -29,9 +41,8 @@ module.exports = {
             email
           )
           const infoUser = await UserModel.getUserByUsername(username)
-          // const checkEmail = await UserModel.checkEmail(email)
-          // console.log(checkEmail)
           await UserDetailModel.createUserDetail(infoUser.id, fullname, phone)
+          console.log(infoUser)
           if (resultUser) {
             if (await UserModel.createVerificationCode(infoUser.id, uuid())) {
               const code = await UserModel.getVerificationCode(username)
@@ -174,5 +185,85 @@ module.exports = {
     } else {
       res.send(message(false, 'Please enter reset code and username'))
     }
+  },
+  updateProfile: async function (req, res) {
+    const id = req.user.id
+    const { name, dateBirth, gender, phone} = req.body
+    const picture = (req.file && req.file.filename) || null
+    const infoUser = await UserDetailModel.getUserDetail(id)
+    const newName = name || infoUser.fullname
+    const newBirth = dateBirth || infoUser.date_birth
+    const newPhone = phone || infoUser.phone
+    const newPhoto = picture || infoUser.photo
+
+    if (gender && dateBirth) {
+      const result = await UserDetailModel.updateUserDetail(newName, newBirth, gender, newPhone, newPhoto, id)
+      if (result) {
+        res.send(message(true, 'Profile updated'))
+      } else {
+        res.send(message(false, 'Profile cant updated'))
+      }
+    } else {
+      res.send(message(false, 'Insert gender and your datebirth please'))
+    }
+
+    res.send(infoUser)
+  },
+  addAddress: async function (req, res) {
+    const id = req.user.id
+    const { city, postcode, street, district } = req.body
+    const infoUserDetail = await UserDetailModel.getUserDetail(id)
+    if (city && postcode && street && district) {
+      await AddressModel.createAddress(infoUserDetail.id, city, postcode, district, street)
+      res.send(message(true, 'Address added'))
+    } else {
+      res.send(message(false, 'Please fill the all input'))
+    }
+
+  },
+  createTransaction: async function (req, res) {
+    try {
+      const id = req.user.id
+      const { totalPrice, postalFee, Product} = req.body
+      const infoTransaction = await TransactionModel.createTransaction(id, totalPrice, postalFee)
+      for (let i = 0; i <= Product.length; i++) {
+        const checkStock = await ProductModel.checkStock(Product[i].id, Product[i].size)
+        if (checkStock.stock === 0) {
+          console.log(`Sepatu ${checkStock.name} dengan ukuran ${checkStock.size} habis`)
+        } else {
+          if (checkStock.stock - Product[i].quantity > 0) {
+            await TransactionDetailModel.createTransactionDetails(infoTransaction, Product[i].id, Product[i].price)
+            await ProductDetailModel.updateStock(Product[i].id, Product[i].size, Product[i].quantity)
+          } else {
+            // res.send(message(false, 'Stock tidak mencukupi untuk pembelian'))
+          }
+        }
+      }
+    } catch (err) {
+      res.send(err)
+    }
+  },
+  getAllProduct: async function (req, res) {
+    let { page, limit, search, sort } = req.query
+    page = parseInt(page) || 1
+    limit = parseInt(limit) || 5
+
+    let key = search && Object.keys(search)[0]
+    let value = search && Object.values(search)[0]
+    search = (search && { key, value }) || { key: 'name', value: '' }
+
+    key = sort && Object.keys(sort)[0]
+    value = sort && Object.values(sort)[0]
+    sort = (sort && { key, value }) || { key: 'price', value: 1 }
+    const conditions = { page, perPage: limit, search, sort }
+    const results = await ProductModel.getAllProducts(conditions)
+    conditions.totalData = await ProductModel.getTotalProducts(conditions)
+    conditions.totalPage = Math.ceil(conditions.totalData / conditions.perPage)
+    delete conditions.search
+    delete conditions.sort
+    delete conditions.limit
+    const data = { data: results, pageInfo: conditions }
+    res.send(message(true, 'true', data))
+
   }
 }

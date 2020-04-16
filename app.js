@@ -12,6 +12,7 @@ require('dotenv').config()
 var user = require('./src/routes/User')
 var admin = require('./src/routes/Admin')
 var product = require('./src/routes/Product')
+var transaction = require('./src/routes/Transactions')
 
 var app = express()
 
@@ -27,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/item', admin)
 app.use('/auth', user)
 app.use('/product', product)
+app.use('/transactions', transaction)
 app.use('/migrate', function (req, res) {
   require('./src/migrations/Roles')
   require('./src/migrations/User')

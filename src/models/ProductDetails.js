@@ -13,5 +13,21 @@ module.exports = {
         }
       })
     })
+  },
+  updateStock: function (idProduct, size, quantity) {
+    const query = `UPDATE ${table} SET stock=stock-${quantity} WHERE id_product = ${idProduct} AND size = ${size}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.affectedRows) {
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
   }
 }
