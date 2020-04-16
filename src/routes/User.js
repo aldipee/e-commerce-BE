@@ -60,4 +60,6 @@ User.post('/insert-address', MidToken.checkToken, UserControl.addAddress)
 
 User.patch('/update-profile', MidToken.checkToken, filterPicture, UserControl.updateProfile)
 
+User.get('/detail', MidToken.checkToken, UserControl.getProfileDetail)
+
 module.exports = User

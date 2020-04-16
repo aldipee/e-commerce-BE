@@ -12,5 +12,17 @@ module.exports = {
         }
       })
     })
+  },
+  getByidUserDetail: function (idUserDetail) {
+    const query = `SELECT * FROM ${table} WHERE id_user_detail = ${idUserDetail}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results)
+        }
+      })
+    })
   }
 }

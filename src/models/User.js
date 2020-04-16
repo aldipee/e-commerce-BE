@@ -1,8 +1,7 @@
 const db = require('../../utils/db')
-
+const table = 'users'
 module.exports = {
   createUser: function (username, password, email) {
-    const table = 'users'
     return new Promise(function (resolve, reject) {
       const query = `INSERT INTO ${table} (username, password, email) VALUES ('${username}','${password}', '${email}')`
       db.query(query, function (err, results, fields) {
@@ -15,7 +14,6 @@ module.exports = {
     })
   },
   checkUsername: function (username) {
-    const table = 'users'
     return new Promise(function (resolve, reject) {
       const query = `SELECT COUNT (*) AS total FROM ${table} WHERE username ='${username}'`
       db.query(query, function (err, results, fields) {
@@ -28,7 +26,6 @@ module.exports = {
     })
   },
   checkEmail: function (email) {
-    const table = 'users'
     return new Promise(function (resolve, reject) {
       const query = `SELECT COUNT (*) AS total FROM ${table} WHERE email ='${email}'`
       db.query(query, function (err, results, fields) {
@@ -41,7 +38,6 @@ module.exports = {
     })
   },
   getUserByUsername: function (username) {
-    const table = 'users'
     return new Promise(function (resolve, reject) {
       const query = `SELECT * FROM ${table} WHERE username = '${username}'`
       console.log(query)
@@ -54,6 +50,18 @@ module.exports = {
           } else {
             resolve(false)
           }
+        }
+      })
+    })
+  },
+  getUserById: function (id) {
+    const query = `SELECT * FROM ${table} WHERE id = ${id}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results)
         }
       })
     })
@@ -155,5 +163,20 @@ module.exports = {
         })
       })
     }
+  },
+  ProfileDetail: async function (id) {
+    const query = `SELECT users.username, users.email, user_details.full_name, user_details.date_birth, user_details.gender, user_details.phone, user_details.balance, user_details.photo
+                    FROM users 
+                    INNER JOIN user_details ON USERS.id = user_details.id_user 
+                    WHERE users.id = ${id}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results[0])
+        }
+      })
+    })
   }
 }

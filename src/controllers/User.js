@@ -253,5 +253,19 @@ module.exports = {
     delete conditions.limit
     const data = { data: results, pageInfo: conditions }
     res.send(message(true, 'true', data))
+  },
+  getProfileDetail: async function (req, res) {
+    const id = req.user.id
+    const infoDetail = await UserModel.ProfileDetail(id)
+    console.log(infoDetail)
+    const userDetail = await UserDetailModel.getUserDetail(id)
+    console.log(userDetail)
+    const address = await AddressModel.getByidUserDetail(userDetail.id)
+    console.log(address)
+    infoDetail.address = address
+    // const data = {
+    //   infoDetail, userDetail, address
+    // }
+    res.send(message(true, infoDetail))
   }
 }
