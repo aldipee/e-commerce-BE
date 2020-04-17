@@ -10,6 +10,7 @@ const ProductModel = require('../models/Products')
 const ProductDetailModel = require('../models/ProductDetails')
 const AddressModel = require('../models/Address')
 const Mail = require('../../utils/sendMail')
+const SMS = require('../../utils/sendSMS')
 
 function message (success, msg, data) {
   if (data) {
@@ -147,10 +148,12 @@ module.exports = {
     if (username) {
       if (await UserModel.checkUsername(username)) {
         const userInfo = await UserModel.getUserByUsername(username)
+        // const userDetail = await UserDetailModel.getUserDetail(userInfo.id)
         if (userInfo.is_registered === 1) {
           await UserModel.createVerificationCode(userInfo.id, uuid())
           const resetCode = await UserModel.getVerificationCode(userInfo.username)
           if (resetCode) {
+            // SMS.sendSMS(resetCode.verification_code, userDetail.phone)
             res.send(message(true, `Reset code : ${resetCode.verification_code}`))
           } else {
             res.send(message(false, 'Reset code can\'t generate'))

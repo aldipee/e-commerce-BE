@@ -6,7 +6,6 @@ var path = require('path')
 var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 const bodyParser = require('body-parser')
-
 require('dotenv').config()
 
 // routes
