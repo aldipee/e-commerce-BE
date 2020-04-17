@@ -88,9 +88,9 @@ module.exports = {
       const checkUser = await UserModel.checkUsername(username)
       if (checkUser) {
         const infoUser = await UserModel.getUserByUsername(username)
-        console.log(infoUser)
-        console.log(infoUser.password)
-        console.log(password)
+        // console.log(infoUser)
+        // console.log(infoUser.password)
+        // console.log(password)
         const checkPassword = bcrypt.compareSync(password, infoUser.password)
         console.log(checkPassword)
         const checkRegistered = await UserModel.checkRegistered(username)
@@ -266,8 +266,22 @@ module.exports = {
     // }
     res.send(message(true, infoDetail))
   },
-  getTransactoinByUser: async function (req, res) {
-    const id = req.user.id
+  getTransactionByUser: async function (req, res) {
+    try {
+      const id = req.user.id
+      const infoTransaction = await TransactionModel.getTransactionByUser(id)
+      console.log(infoTransaction)
+      const data = []
+      // console.log(infoTransaction[0].id)
+      for (let i = 0; i <= infoTransaction.length; i++) {
+        const temp = await TransactionDetailModel.getTransactionDetailsByIdTransaction(infoTransaction[i].id)
+        // data.push(temp)
+      }
+      // console.log(data.length)
+      // infoTransaction.TransactionDetail.Product = await ProductModel.getProductById(infoTransaction[i].TransactionDetail[i].id_product)
+    } catch (error) {
+      console.log(error)
+    }
 
   }
 }

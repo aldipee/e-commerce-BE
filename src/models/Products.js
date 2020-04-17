@@ -86,5 +86,18 @@ module.exports = {
         }
       })
     })
+  },
+  getProductById: function (id) {
+    const query = `SELECT * FROM ${table} WHERE id = ${id}`
+    console.log(query)
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results)
+        }
+      })
+    })
   }
 }

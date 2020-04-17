@@ -30,7 +30,16 @@ module.exports = {
       })
     })
   },
-  getTransactionByUserId: function (idUser) {
-    const query = `SELECT`
+  getTransactionByUser: function (idUser) {
+    const query = `SELECT * FROM ${table} WHERE id_user = ${idUser}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results)
+        }
+      })
+    })
   }
 }
