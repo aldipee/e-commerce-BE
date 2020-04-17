@@ -14,8 +14,25 @@ module.exports = {
       })
     })
   },
-  updateUserDetail: function (name, dateBirth, gender, phone, photo, idUser) {
-    const query = `UPDATE ${table} SET full_name = '${name}', date_birth = '${dateBirth}', gender = ${gender}, phone = '${phone}', photo = '${photo}' WHERE id_user = ${idUser}`
+  updateUserDetail: function (name, dateBirth, gender, phone, idUser) {
+    const query = `UPDATE ${table} SET full_name = '${name}', date_birth = '${dateBirth}', gender = ${gender}, phone = '${phone}' WHERE id_user = ${idUser}`
+    console.log(query)
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.affectedRows) {
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
+  },
+  updatePicture: function (photo, idUser) {
+    const query = `UPDATE ${table} SET photo = '${photo}' where id_user = ${idUser}`
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {

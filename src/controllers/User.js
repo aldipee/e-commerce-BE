@@ -191,28 +191,28 @@ module.exports = {
       res.send(message(false, 'Please enter reset code and username'))
     }
   },
-  updateProfile: async function (req, res) {
+  updatePersonal: async function (req, res) {
     const id = req.user.id
     const { name, dateBirth, gender, phone } = req.body
-    const picture = (req.file && req.file.filename) || null
     const infoUser = await UserDetailModel.getUserDetail(id)
     const newName = name || infoUser.full_name
     const newBirth = dateBirth || infoUser.date_birth
     const newPhone = phone || infoUser.phone
-    const newPhoto = picture || infoUser.photo
-
-    if (gender && dateBirth) {
-      const result = await UserDetailModel.updateUserDetail(newName, newBirth, gender, newPhone, newPhoto, id)
-      if (result) {
-        res.send(message(true, 'Profile updated'))
-      } else {
-        res.send(message(false, 'Profile cant updated'))
-      }
+    const Gender = gender || infoUser.gender
+    const result = await UserDetailModel.updateUserDetail(newName, newBirth, Gender, newPhone, id)
+    if (result) {
+      res.send(message(true, 'Profile updated'))
     } else {
-      res.send(message(false, 'Insert gender and your datebirth please'))
+      res.send(message(false, 'Profile cant updated'))
     }
 
     res.send(infoUser)
+  },
+  updatePict: async function (req, res) {
+    const id = req.user.id
+    const picture = (req.file && req.file.filename) || null
+    await UserDetailModel.updatePicture(picture, id)
+    res.send(message(true, 'photo updated'))
   },
   addAddress: async function (req, res) {
     const id = req.user.id

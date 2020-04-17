@@ -58,7 +58,8 @@ User.post('/reset-password', UserControl.resetPass)
 User.post('/email-check', UserControl.emailCheck)
 User.post('/insert-address', MidToken.checkToken, UserControl.addAddress)
 
-User.patch('/update-profile', MidToken.checkToken, filterPicture, UserControl.updateProfile)
+User.patch('/update-personal', MidToken.checkToken, UserControl.updatePersonal)
+User.patch('/update-pic', MidToken.checkToken, filterPicture, UserControl.updatePict)
 
 User.get('/detail', MidToken.checkToken, UserControl.getProfileDetail)
 
