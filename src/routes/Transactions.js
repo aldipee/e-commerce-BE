@@ -7,5 +7,6 @@ const AdminControl = require('../controllers/Admin')
 // transactions
 Transactions.post('/new', MidToken.checkToken, UserControl.createTransaction)
 Transactions.patch('/:id', MidToken.checkToken, AdminControl.updateTransactionDetail)
+Transactions.get('/user', MidToken.checkToken, )
 
 module.exports = Transactions

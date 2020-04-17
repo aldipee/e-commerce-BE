@@ -191,7 +191,7 @@ module.exports = {
     const { name, dateBirth, gender, phone } = req.body
     const picture = (req.file && req.file.filename) || null
     const infoUser = await UserDetailModel.getUserDetail(id)
-    const newName = name || infoUser.fullname
+    const newName = name || infoUser.full_name
     const newBirth = dateBirth || infoUser.date_birth
     const newPhone = phone || infoUser.phone
     const newPhoto = picture || infoUser.photo
@@ -265,5 +265,9 @@ module.exports = {
     //   infoDetail, userDetail, address
     // }
     res.send(message(true, infoDetail))
+  },
+  getTransactoinByUser: async function (req, res) {
+    const id = req.user.id
+
   }
 }

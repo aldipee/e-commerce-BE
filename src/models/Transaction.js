@@ -29,5 +29,8 @@ module.exports = {
         }
       })
     })
+  },
+  getTransactionByUserId: function (idUser) {
+    const query = `SELECT`
   }
 }
