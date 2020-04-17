@@ -9,6 +9,7 @@ const TransactionDetailModel = require('../models/TransactionDetails')
 const ProductModel = require('../models/Products')
 const ProductDetailModel = require('../models/ProductDetails')
 const AddressModel = require('../models/Address')
+const Mail = require('../../utils/sendMail')
 
 function message (success, msg, data) {
   if (data) {
@@ -46,6 +47,7 @@ module.exports = {
           if (resultUser) {
             if (await UserModel.createVerificationCode(infoUser.id, uuid())) {
               const code = await UserModel.getVerificationCode(username)
+              Mail.sendMail(email, code.verification_code)
               res.send(
                 message(true, `Verification code: ${code.verification_code}`)
               )
