@@ -316,7 +316,8 @@ module.exports = {
           //   status: 'OK',
           //   message: 'User Dont HaveAny TRX'
           // })
-          res.send(message(false, 'You dont have any Transaction'))
+
+          res.send(message(false, 'You dont have any Transaction', results))
         }
       }
       // Function END HERE
