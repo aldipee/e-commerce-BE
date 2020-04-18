@@ -31,7 +31,7 @@ module.exports = {
   },
   getTransactionJoinProduct: function (id) {
     const query = `SELECT transaction_details.id_transaction, transaction_details.price
-                  , transaction_details.quantity, products.name
+                  , transaction_details.quantity, products.name, products.picture
                   FROM transaction_details INNER JOIN products ON transaction_details.id_product = products.id
                   WHERE transaction_details.id_transaction = ${id}`
     return new Promise(function (resolve, reject) {

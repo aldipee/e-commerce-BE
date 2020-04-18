@@ -290,7 +290,7 @@ module.exports = {
       let { page, limit, search, sort } = req.query
       page = parseInt(page) || 1
       limit = parseInt(limit) || 5
-      search = (search && { key: search.key, value: search.value }) || { key: 'receipt_number', value: '' }
+      search = (search && { key: search.key, value: search.value }) || { key: 'invoice_number', value: '' }
       sort = (sort && { key, value }) || { key: 'created_at', value: 1 }
       const conditions = { page, perPage: limit, search, sort }
       const fetchTradeDetail = async () => {
@@ -302,7 +302,7 @@ module.exports = {
         delete conditions.limit
         if (results.length) {
           const promisess = results.map(async obj => {
-            const infoTradeDetail = await TransactionDetailModel.getTransactionDetailsByIdTransaction(
+            const infoTradeDetail = await TransactionDetailModel.getTransactionJoinProduct(
               obj.id
             )
             return { ...obj, transactionDetail: infoTradeDetail }
