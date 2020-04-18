@@ -230,18 +230,19 @@ module.exports = {
       const id = req.user.id
       const { totalPrice, postalFee, Product } = req.body
       const infoBalance = await UserDetailModel.getUserDetail(id)
-      console.log(infoBalance.balance)
-
-    
-      // res.send(message(true, 'Success'))
-      // const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee)
-      // res.send(message(true, 'Transaction success', totalProductPrice))
-      // for (let i = 0; i <= Product.length; i++) {
-      //   await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].idProduct, Product[i].price, Product[i].quantity)
-      //   const tempPrice = Product[i].price * Product[i].quantity
-      //   totalProductPrice += tempPrice
-      //   await ProductModel.buy(Product[i].quantity, Product[i].idProduct)
-      // }
+      const newBalance = infoBalance.balance - totalPrice
+      console.log(newBalance)
+      if (newBalance > 0) {
+        await UserDetailModel.updateBalance(id, newBalance)
+        res.send(message(true, 'Success', newBalance))
+        const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee)
+        for (let i = 0; i <= Product.length; i++) {
+          await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].idProduct, Product[i].price, Product[i].quantity)
+          await ProductModel.buy(Product[i].quantity, Product[i].idProduct)
+        }
+      } else {
+        res.send(message(false, 'Please top up your balance', newBalance))
+      }
     } catch (err) {
       console.log(err)
     }
