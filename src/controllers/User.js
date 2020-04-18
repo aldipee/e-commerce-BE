@@ -216,28 +216,35 @@ module.exports = {
   },
   addAddress: async function (req, res) {
     const id = req.user.id
-    const { city, postcode, street, district } = req.body
+    const { city, postcode, street, district, idCity } = req.body
     const infoUserDetail = await UserDetailModel.getUserDetail(id)
     if (city && postcode && street && district) {
-      await AddressModel.createAddress(infoUserDetail.id, city, postcode, district, street)
+      await AddressModel.createAddress(infoUserDetail.id, city, postcode, district, street, idCity)
       res.send(message(true, 'Address added'))
     } else {
       res.send(message(false, 'Please fill the all input'))
     }
   },
   createTransaction: async function (req, res) {
-    const id = req.user.id
-    const { totalPrice, postalFee, Product } = req.body
-    const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee)
-    const totalProductPrice = 0
-    // res.send(message(true, 'Transaction success'))
-    for (let i = 0; i <= Product.length; i++) {
-      await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].idProduct, Product[i].price, Product[i].quantity)
-      const tempPrice = Product[i].price * Product[i].quantity
-      totalProductPrice += tempPrice
-      await ProductModel.buy(Product[i].quantity, Product[i].idProduct)
+    try {
+      const id = req.user.id
+      const { totalPrice, postalFee, Product } = req.body
+      const infoBalance = await UserDetailModel.getUserDetail(id)
+      console.log(infoBalance.balance)
+
+    
+      // res.send(message(true, 'Success'))
+      // const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee)
+      // res.send(message(true, 'Transaction success', totalProductPrice))
+      // for (let i = 0; i <= Product.length; i++) {
+      //   await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].idProduct, Product[i].price, Product[i].quantity)
+      //   const tempPrice = Product[i].price * Product[i].quantity
+      //   totalProductPrice += tempPrice
+      //   await ProductModel.buy(Product[i].quantity, Product[i].idProduct)
+      // }
+    } catch (err) {
+      console.log(err)
     }
-    res.send(message(true, 'Success', totalProductPrice))
   },
   getAllProduct: async function (req, res) {
     let { page, limit, search, sort } = req.query
