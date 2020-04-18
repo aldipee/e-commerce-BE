@@ -285,20 +285,34 @@ module.exports = {
   getTransactionByUser: async function (req, res) {
     try {
       const id = req.user.id
-      const idTransaction = []
-      const countTransaction = await TransactionModel.countTransactionByUserId(id) // total Transaction
-      const infoTransaction = await TransactionModel.getTransactionByUser(id)
-      const Transaction = []
-      if (countTransaction !== 0) {
-        for (let i = 0; i <= countTransaction; i++) {
-          idTransaction.push(infoTransaction[i].id)
-          // const temp = TransactionDetailModel.getTransactionDetailsByIdTransaction(infoTransaction[i].id)
-          // Transaction.push(temp)
+      //  Buat sebuah ascyn Function
+      const fetchTradeDetail = async () => {
+        const results = await TransactionModel.getTransactionByUser(id)
+        if (results.length) {
+          const promisess = results.map(async obj => {
+            const infoTradeDetail = await TransactionDetailModel.getTransactionDetailsByIdTransaction(
+              obj.id
+            )
+            return { ...obj, transactionDetail: infoTradeDetail }
+          })
+          // wait to all promises complete
+          const promiseDone = Promise.all(promisess)
+          return promiseDone
+        } else {
+          res.status(200).send({
+            status: 'OK',
+            message: 'User Dont HaveAny TRX'
+          })
         }
-        res.send(message(true, 'This is your transaction', idTransaction))
-      } else {
-        res.send(message(false, 'You dont have any transaction history'))
       }
+      // Function END HERE
+      fetchTradeDetail()
+        .then(data => {
+          res.send({ status: 'OK', data })
+        })
+        .catch(err => {
+          console.log(err)
+        })
     } catch (error) {
       console.log(error)
     }

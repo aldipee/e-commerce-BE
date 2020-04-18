@@ -44,6 +44,7 @@ module.exports = {
   },
   countTransactionByUserId: function (idUser) {
     const query = `SELECT COUNT (*) AS total FROM ${table} WHERE id_user = ${idUser}`
+    console.log(query)
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {
