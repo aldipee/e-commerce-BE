@@ -238,6 +238,7 @@ module.exports = {
         await UserDetailModel.updateBalance(id, newBalance)
         res.send(message(true, 'Success', newBalance))
         const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee, newInvoiceNumber)
+        await TransactionModel.updateStatus(idTrans, 1)
         for (let i = 0; i <= Product.length; i++) {
           await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].idProduct, Product[i].price, Product[i].quantity)
           await ProductModel.buy(Product[i].quantity, Product[i].idProduct)
@@ -279,9 +280,6 @@ module.exports = {
     const address = await AddressModel.getByidUserDetail(userDetail.id)
     console.log(address)
     infoDetail.address = address
-    // const data = {
-    //   infoDetail, userDetail, address
-    // }
     res.send(message(true, infoDetail))
   },
   getTransactionByUser: async function (req, res) {
@@ -290,7 +288,7 @@ module.exports = {
       let { page, limit, search, sort } = req.query
       page = parseInt(page) || 1
       limit = parseInt(limit) || 5
-      search = (search && { key: search.key, value: search.value }) || { key: 'invoice_number', value: '' }
+      search = (search && { key: search.key, value: search.value }) || { key: 'receipt_number', value: '' }
       sort = (sort && { key, value }) || { key: 'created_at', value: 1 }
       const conditions = { page, perPage: limit, search, sort }
       const fetchTradeDetail = async () => {
@@ -302,24 +300,18 @@ module.exports = {
         delete conditions.limit
         if (results.length) {
           const promisess = results.map(async obj => {
-            const infoTradeDetail = await TransactionDetailModel.getTransactionJoinProduct(
+            const infoTradeDetail = await TransactionDetailModel.getTransactionDetailsByIdTransaction(
               obj.id
             )
             return { ...obj, transactionDetail: infoTradeDetail }
           })
-          // wait to all promises complete
           const promiseDone = Promise.all(promisess)
           return promiseDone
         } else {
-          // res.status(200).send({
-          //   status: 'OK',
-          //   message: 'User Dont HaveAny TRX'
-          // })
-
           res.send(message(false, 'You dont have any Transaction', results))
         }
       }
-      // Function END HERE
+      // function end
       fetchTradeDetail()
         .then(data => {
           const finalData = { data: data, pageInfo: conditions }
