@@ -6,6 +6,7 @@ const query = `CREATE TABLE IF NOT EXISTS products(
                price INT NOT NULL,
                picture TEXT,
                is_deleted TINYINT(1) DEFAULT 0,
+               stock INT DEFAULT 1,
               created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
               updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
               CONSTRAINT product_category FOREIGN KEY(id_category) REFERENCES categories(id) ON DELETE RESTRICT ON UPDATE CASCADE)`

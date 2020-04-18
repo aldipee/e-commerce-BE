@@ -107,7 +107,7 @@ module.exports = {
             const options = { expiresIn: '15m' }
             const key = process.env.APP_KEY
             const token = jwt.sign(payload, key, options)
-            res.send(message(true, `Token : ${token}`))
+            res.send(message(true, 'Login Success', token))
           } else {
             res.send(message(false, 'Wrong password !'))
           }
@@ -229,11 +229,15 @@ module.exports = {
     const id = req.user.id
     const { totalPrice, postalFee, Product } = req.body
     const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee)
-    res.send(message(true, 'Transaction success'))
+    const totalProductPrice = 0
+    // res.send(message(true, 'Transaction success'))
     for (let i = 0; i <= Product.length; i++) {
       await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].idProduct, Product[i].price, Product[i].quantity)
+      const tempPrice = Product[i].price * Product[i].quantity
+      totalProductPrice += tempPrice
       await ProductModel.buy(Product[i].quantity, Product[i].idProduct)
     }
+    res.send(message(true, 'Success', totalProductPrice))
   },
   getAllProduct: async function (req, res) {
     let { page, limit, search, sort } = req.query
