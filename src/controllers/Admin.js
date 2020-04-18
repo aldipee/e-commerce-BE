@@ -1,13 +1,21 @@
+const uuid = require('uuid').v4
 const CategoryModel = require('../models/Categories')
 const ProductModel = require('../models/Products')
 const ProductDetail = require('../models/ProductDetails')
 const TransactionModel = require('../models/Transaction')
-function message (value, message) {
-  const data = {
-    true: value,
-    msg: message
+function message (success, msg, data) {
+  if (data) {
+    return {
+      success: success,
+      msg: msg,
+      data: data
+    }
+  } else {
+    return {
+      success: success,
+      msg: msg
+    }
   }
-  return data
 }
 
 module.exports = {
@@ -86,13 +94,47 @@ module.exports = {
       res.send(message(false, 'U cant access this feature'))
     }
   },
-  updateTransactionDetail: async function (req, res) {
+  updateTransactionStatusToSend: async function (req, res) {
     const { id } = req.params
     const { status } = req.body
     const role = req.user.roleId
+    const receiptCode = uuid()
+    const newReceiptCode = receiptCode.substr(0, 8)
     if (role === 1) {
-      await TransactionModel.updateStatus(id, status)
-      res.send(message(true, 'Transaction status updated'))
+      await TransactionModel.updateStatusItemSend(id, status, newReceiptCode)
+      res.send(message(true, `Transaction status updated to ${status}`))
+    } else {
+      res.send(message(false, 'U cant access this feature'))
+    }
+  },
+  updateTransactionStatus: async function (req, res) {
+    const role = req.user.roleId
+    const { id } = req.params
+    const { status } = req.body
+    if (role === 1) {
+      await TransactionModel.updateStatusTransaction(id, status)
+      res.send(message(true, `Transaction status updated to ${status}`))
+    } else {
+      res.send(message(false, 'U cant access this feature'))
+    }
+  },
+  getAllTransactionByAdmin: async function (req, res) {
+    const roleId = req.user.roleId
+    let { page, limit, search, sort } = req.query
+    page = parseInt(page) || 1
+    limit = parseInt(limit) || 5
+    search = (search && { key: search.key, value: search.value }) || { key: 'status', value: '' }
+    sort = (sort && { key, value }) || { key: 'id', value: 1 }
+    const conditions = { page, perPage: limit, search, sort }
+    if (roleId === 1) {
+      const infoTransaction = await TransactionModel.getAllTransactionByAdmin(conditions)
+      conditions.totalData = await TransactionModel.getTotalTransactions(conditions)
+      conditions.totalPage = Math.ceil(conditions.totalData / conditions.perPage)
+      delete conditions.search
+      delete conditions.sort
+      delete conditions.limit
+      const dataTransaction = { data: infoTransaction, pageInfo: conditions }
+      res.send(message(true, 'List of transactions', dataTransaction))
     } else {
       res.send(message(false, 'U cant access this feature'))
     }

@@ -1,5 +1,5 @@
 var express = require('express')
-const admin = express.Router()
+const item = express.Router()
 const multer = require('multer')
 const path = require('path')
 
@@ -48,8 +48,7 @@ function filterPicture (req, res, next) {
   })
 }
 // item
-admin.post('/category', filterPicture, MidToken.checkToken, AdminControl.createCategory)
-admin.patch('/category/:id', MidToken.checkToken, AdminControl.deleteCategory)
+item.post('/category', filterPicture, MidToken.checkToken, AdminControl.createCategory)
+item.patch('/category/:id', MidToken.checkToken, AdminControl.deleteCategory)
 
-
-module.exports = admin
+module.exports = item

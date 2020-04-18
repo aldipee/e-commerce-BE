@@ -14,9 +14,24 @@ module.exports = {
       })
     })
   },
-  updateStatus: function (id, status) {
-    const query = `UPDATE ${table} SET status = ${status} WHERE id=${id}`
-    console.log(query)
+  updateStatusItemSend: function (id, status, receiptCode) {
+    const query = `UPDATE ${table} SET status = ${status}, receipt_number = '${receiptCode}' WHERE id=${id}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.affectedRows) {
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
+  },
+  updateStatusTransaction: function (id, status) {
+    const query = `UPDATE ${table} SET status = ${status} WHERE id = ${id}`
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {
@@ -62,5 +77,36 @@ module.exports = {
         }
       })
     })
-  }
+  },
+  getAllTransactionByAdmin: async function (conditions) {
+    const { page, perPage, sort, search } = conditions
+    const query = `SELECT * FROM ${table} WHERE CAST(${search.key} AS VARCHAR(5)) LIKE '${search.value}%'
+                  ORDER BY ${sort.key} ${sort.value ? 'ASC' : 'DESC'}
+                  LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
+    console.log(query)
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results)
+        }
+      })
+    })
+  },
+  getTotalTransactions: function (conditions = {}) {
+    let { search } = conditions
+    search = search || { key: 'status', value: '' }
+    return new Promise(function (resolve, reject) {
+      const query = `SELECT COUNT(*) AS total FROM ${table}
+                    WHERE CAST(${search.key} AS VARCHAR(5)) LIKE '${search.value}%'`
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results[0].total)
+        }
+      })
+    })
+  },
 }

@@ -10,7 +10,7 @@ require('dotenv').config()
 
 // routes
 var user = require('./src/routes/User')
-var item = require('../src/routes/Item
+var item = require('./src/routes/Item')
 var product = require('./src/routes/Product')
 var transaction = require('./src/routes/Transactions')
 
