@@ -2,8 +2,8 @@ const db = require('../../utils/db')
 const table = 'transactions'
 
 module.exports = {
-  createTransaction: function (idUser, totalPrice, postalFee) {
-    const query = `INSERT INTO ${table} (id_user, total_price, postal_fee) VALUES (${idUser}, ${totalPrice}, ${postalFee}) `
+  createTransaction: function (idUser, totalPrice, postalFee, receiptNumber) {
+    const query = `INSERT INTO ${table} (id_user, total_price, postal_fee, receipt_number) VALUES (${idUser}, ${totalPrice}, ${postalFee}, '${receiptNumber}') `
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {
@@ -30,8 +30,12 @@ module.exports = {
       })
     })
   },
-  getTransactionByUser: function (idUser) {
-    const query = `SELECT * FROM ${table} WHERE id_user = ${idUser}`
+  getTransactionByUser: function (idUser, conditions) {
+    const { page, perPage, sort, search } = conditions
+    const query = `SELECT * FROM ${table}  
+                  WHERE ${search.key} LIKE '${search.value}%' AND id_user = ${idUser}
+                  ORDER BY ${sort.key} ${sort.value ? 'ASC' : 'DESC'} 
+                  LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {
@@ -42,8 +46,11 @@ module.exports = {
       })
     })
   },
-  countTransactionByUserId: function (idUser) {
-    const query = `SELECT COUNT (*) AS total FROM ${table} WHERE id_user = ${idUser}`
+  getTotalTransactionByUser: function (idUser, conditions = {}) {
+    let { search } = conditions
+    search = search || { key: 'id', value: '' }
+    const query = `SELECT COUNT(*) AS total FROM ${table}
+                  WHERE ${search.key} LIKE '${search.value}%' AND id_user = ${idUser}`
     console.log(query)
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {

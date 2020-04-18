@@ -228,6 +228,9 @@ module.exports = {
   createTransaction: async function (req, res) {
     try {
       const id = req.user.id
+      const receiptNumber = uuid()
+      const newReceiptNumber = receiptNumber.substring(0, 8)
+      console.log(newReceiptNumber)
       const { totalPrice, postalFee, Product } = req.body
       const infoBalance = await UserDetailModel.getUserDetail(id)
       const newBalance = infoBalance.balance - totalPrice
@@ -235,7 +238,7 @@ module.exports = {
       if (newBalance > 0) {
         await UserDetailModel.updateBalance(id, newBalance)
         res.send(message(true, 'Success', newBalance))
-        const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee)
+        const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee, newReceiptNumber)
         for (let i = 0; i <= Product.length; i++) {
           await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].idProduct, Product[i].price, Product[i].quantity)
           await ProductModel.buy(Product[i].quantity, Product[i].idProduct)
@@ -285,9 +288,19 @@ module.exports = {
   getTransactionByUser: async function (req, res) {
     try {
       const id = req.user.id
-      //  Buat sebuah ascyn Function
+      let { page, limit, search, sort } = req.query
+      page = parseInt(page) || 1
+      limit = parseInt(limit) || 5
+      search = (search && { key: search.key, value: search.value }) || { key: 'receipt_number', value: '' }
+      sort = (sort && { key, value }) || { key: 'created_at', value: 1 }
+      const conditions = { page, perPage: limit, search, sort }
       const fetchTradeDetail = async () => {
-        const results = await TransactionModel.getTransactionByUser(id)
+        const results = await TransactionModel.getTransactionByUser(id, conditions)
+        conditions.totalData = await TransactionModel.getTotalTransactionByUser(id, conditions)
+        conditions.totalPage = Math.ceil(conditions.totalData / conditions.perPage)
+        delete conditions.search
+        delete conditions.sort
+        delete conditions.limit
         if (results.length) {
           const promisess = results.map(async obj => {
             const infoTradeDetail = await TransactionDetailModel.getTransactionDetailsByIdTransaction(
@@ -299,16 +312,18 @@ module.exports = {
           const promiseDone = Promise.all(promisess)
           return promiseDone
         } else {
-          res.status(200).send({
-            status: 'OK',
-            message: 'User Dont HaveAny TRX'
-          })
+          // res.status(200).send({
+          //   status: 'OK',
+          //   message: 'User Dont HaveAny TRX'
+          // })
+          res.send(message(false, 'You dont have any Transaction'))
         }
       }
       // Function END HERE
       fetchTradeDetail()
         .then(data => {
-          res.send({ status: 'OK', data })
+          const finalData = { data: data, pageInfo: conditions }
+          res.send(message(true, 'Your transactions', finalData))
         })
         .catch(err => {
           console.log(err)

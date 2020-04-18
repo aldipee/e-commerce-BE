@@ -48,7 +48,7 @@ module.exports = {
     let { search } = conditions
     search = search || { key: 'name', value: '' }
     return new Promise(function (resolve, reject) {
-      const query = `SELECT COUNT (*) AS total FROM ${table}
+      const query = `SELECT COUNT(*) AS total FROM ${table}
                   WHERE ${search.key} LIKE '${search.value}%' AND stock != 0`
       db.query(query, function (err, results, fields) {
         if (err) {
