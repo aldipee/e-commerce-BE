@@ -10,7 +10,7 @@ require('dotenv').config()
 
 // routes
 var user = require('./src/routes/User')
-var admin = require('./src/routes/Admin')
+var item = require('../src/routes/Item
 var product = require('./src/routes/Product')
 var transaction = require('./src/routes/Transactions')
 
@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 
 app.use('/public/image', express.static(path.join(__dirname, 'files')))
-app.use('/item', admin)
+app.use('/item', item)
 app.use('/auth', user)
 app.use('/product', product)
 app.use('/transactions', transaction)
