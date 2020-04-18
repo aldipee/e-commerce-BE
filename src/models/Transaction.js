@@ -41,5 +41,17 @@ module.exports = {
         }
       })
     })
+  },
+  countTransactionByUserId: function (idUser) {
+    const query = `SELECT COUNT (*) AS total FROM ${table} WHERE id_user = ${idUser}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results[0].total)
+        }
+      })
+    })
   }
 }

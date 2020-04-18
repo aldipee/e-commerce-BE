@@ -31,7 +31,7 @@ module.exports = {
     return new Promise(function (resolve, reject) {
       const sql = `SELECT categories.id as idCategory, products.id as idProduct, categories.name as categoryName, categories.thumbnail, products.name, products.price, products.picture, products.stock
                   FROM ${table} INNER JOIN categories ON categories.id = products.id_category
-                  WHERE ${search.key} LIKE '${search.value}%'
+                  WHERE ${search.key} LIKE '${search.value}%' AND products.stock != 0
                   ORDER BY ${sort.key} ${sort.value ? 'ASC' : 'DESC'} 
                    LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
       console.log(sql)
@@ -49,7 +49,7 @@ module.exports = {
     search = search || { key: 'name', value: '' }
     return new Promise(function (resolve, reject) {
       const query = `SELECT COUNT (*) AS total FROM ${table}
-                  WHERE ${search.key} LIKE '${search.value}%'`
+                  WHERE ${search.key} LIKE '${search.value}%' AND stock != 0`
       db.query(query, function (err, results, fields) {
         if (err) {
           reject(err)

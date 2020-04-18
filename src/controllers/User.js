@@ -229,12 +229,11 @@ module.exports = {
     const id = req.user.id
     const { totalPrice, postalFee, Product } = req.body
     const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee)
+    res.send(message(true, 'Transaction success'))
     for (let i = 0; i <= Product.length; i++) {
-      await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].id, 800000, Product[i].quantity)
-      console.log(Product[i].id)
-      await ProductModel.buy(Product[i].quantity, Product[i].id)
+      await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].idProduct, Product[i].price, Product[i].quantity)
+      await ProductModel.buy(Product[i].quantity, Product[i].idProduct)
     }
-    res.send(true, 'Transaction success')
   },
   getAllProduct: async function (req, res) {
     let { page, limit, search, sort } = req.query
@@ -274,19 +273,22 @@ module.exports = {
   getTransactionByUser: async function (req, res) {
     try {
       const id = req.user.id
+      const idTransaction = []
+      const countTransaction = await TransactionModel.countTransactionByUserId(id) // total Transaction
       const infoTransaction = await TransactionModel.getTransactionByUser(id)
-      console.log(infoTransaction)
-      const data = []
-      // console.log(infoTransaction[0].id)
-      for (let i = 0; i <= infoTransaction.length; i++) {
-        const temp = await TransactionDetailModel.getTransactionDetailsByIdTransaction(infoTransaction[i].id)
-        // data.push(temp)
+      const Transaction = []
+      if (countTransaction !== 0) {
+        for (let i = 0; i <= countTransaction; i++) {
+          idTransaction.push(infoTransaction[i].id)
+          // const temp = TransactionDetailModel.getTransactionDetailsByIdTransaction(infoTransaction[i].id)
+          // Transaction.push(temp)
+        }
+        res.send(message(true, 'This is your transaction', idTransaction))
+      } else {
+        res.send(message(false, 'You dont have any transaction history'))
       }
-      // console.log(data.length)
-      // infoTransaction.TransactionDetail.Product = await ProductModel.getProductById(infoTransaction[i].TransactionDetail[i].id_product)
     } catch (error) {
       console.log(error)
     }
-
   }
 }
