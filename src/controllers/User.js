@@ -52,7 +52,8 @@ module.exports = {
               const code = await UserModel.getVerificationCode(username)
               // uncomment below this for sending email when registration
               // const path = process.env.ACTIVATION_PATH
-              // Mail.sendMail(email, code.verification_code, path)
+              // const bodyEmail = `<p>Click this <a href='${path}';>link<a/> for activate your account, or inser this code : ${verCode}</p>`
+              // Mail.sendMail(email, 'ACTIVATION_CODE', bodyEmail)
               res.send(
                 message(true, `Verification code: ${code.verification_code}`)
               )
