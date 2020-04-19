@@ -2,7 +2,6 @@ require('dotenv').config()
 var nodemailer = require('nodemailer')
 const useremail = process.env.EMAIL
 const passmail = process.env.PASS_MAIL
-const Invoice = require('./invoice')
 
 module.exports = {
   sendMail: function (sendTo, subject, bodyEmail) {
@@ -16,9 +15,8 @@ module.exports = {
     const mailOptions = {
       from: useremail, // sender address
       to: `${sendTo}`, // list of receivers
-      subject: `[${subject}]`, // Subject line
-      // html: `${bodyEmail}`// plain text body
-      html: Invoice
+      subject: `${subject}`, // Subject line
+      html: `${bodyEmail}`// plain text body
     }
 
     transporter.sendMail(mailOptions, function (err, info) {

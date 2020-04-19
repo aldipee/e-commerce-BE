@@ -12,6 +12,7 @@ const ProductDetailModel = require('../models/ProductDetails')
 const AddressModel = require('../models/Address')
 const Mail = require('../../utils/sendMail')
 const SMS = require('../../utils/sendSMS')
+const Invoice = require('../../utils/invoice')
 
 function message (success, msg, data) {
   if (data) {
@@ -110,7 +111,7 @@ module.exports = {
               username,
               roleId: infoUser.role_id
             }
-            const options = { expiresIn: '15m' }
+            const options = { expiresIn: '1d' }
             const key = process.env.APP_KEY
             const token = jwt.sign(payload, key, options)
             res.send(message(true, 'Login Success', token))
@@ -245,13 +246,19 @@ module.exports = {
       console.log(newBalance)
       if (newBalance > 0) {
         await UserDetailModel.updateBalance(id, newBalance)
-        res.send(message(true, 'Success', newBalance))
         const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee, newInvoiceNumber)
-        await TransactionModel.updateStatus(idTrans, 1)
-        for (let i = 0; i <= Product.length; i++) {
-          await TransactionDetailModel.createTransactionDetails(idTrans, Product[i].idProduct, Product[i].price, Product[i].quantity)
-          await ProductModel.buy(Product[i].quantity, Product[i].idProduct)
+        await TransactionModel.updateStatusTransaction(idTrans, 1)
+        const insertDataProducts = async () => {
+          const insert = Product.map(async data => {
+            await TransactionDetailModel.createTransactionDetails(idTrans, data.idProduct, data.price, data.quantity)
+            await ProductModel.buy(data.quantity, data.idProduct)
+          })
+          const PromiseDone = Promise.all(insert)
+          return PromiseDone
         }
+        insertDataProducts().then((data) => {
+          res.send(message(true, 'transaction success', newBalance))
+        })
       } else {
         res.send(message(false, 'Please top up your balance', newBalance))
       }
