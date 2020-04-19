@@ -5,6 +5,7 @@ const path = require('path')
 
 const MidToken = require('../middleware/Auth')
 const UserControl = require('../controllers/User')
+const AdminControl = require('../controllers/Admin')
 
 const storage = multer.diskStorage({
   destination: 'files/',
@@ -60,6 +61,7 @@ User.post('/insert-address', MidToken.checkToken, UserControl.addAddress)
 
 User.patch('/update-personal', MidToken.checkToken, UserControl.updatePersonal)
 User.put('/update-pic', MidToken.checkToken, filterPicture, UserControl.updatePict)
+User.patch('/topup/:id', MidToken.checkToken, AdminControl.updateSaldo)
 
 User.get('/detail', MidToken.checkToken, UserControl.getProfileDetail)
 

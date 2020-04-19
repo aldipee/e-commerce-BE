@@ -75,5 +75,22 @@ module.exports = {
         }
       })
     })
+  },
+  topupBalance: function (idUser, balance) {
+    const query = `UPDATE ${table} SET balance = balance + ${balance} WHERE id_user = ${idUser}`
+    console.log(query)
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.affectedRows) {
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
   }
 }

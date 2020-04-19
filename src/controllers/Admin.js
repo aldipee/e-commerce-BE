@@ -3,6 +3,7 @@ const CategoryModel = require('../models/Categories')
 const ProductModel = require('../models/Products')
 const ProductDetail = require('../models/ProductDetails')
 const TransactionModel = require('../models/Transaction')
+const UserDetailModel = require('../models/UserDetail')
 function message (success, msg, data) {
   if (data) {
     return {
@@ -179,6 +180,30 @@ module.exports = {
       }
     } else {
       res.send(message(false, 'U cant access this feature'))
+    }
+  },
+  updateSaldo: async function (req, res) {
+    try {
+      const role = req.user.roleId
+      const { id } = req.params
+      const { balance } = req.body
+      if (role === 1) {
+        if (await UserDetailModel.getUserDetail(id)) {
+          if (balance) {
+            await UserDetailModel.topupBalance(id, balance)
+            res.send(message(true, 'Topup succesfull'))
+          } else {
+            res.send(message(false, 'Please fill the balance field'))
+          }
+        } else {
+          res.send(message(false, 'Id user not found'))
+        }  
+      } else {
+        res.send(message(false, 'U cant access this feature'))
+      }
+
+    } catch (err) {
+      res.send(message(false, err))
     }
   }
 }
