@@ -56,6 +56,20 @@ module.exports = {
       res.send(message, err)
     }
   },
+  updateCategory: async function (req, res) {
+    const idUser = req.user.id
+    const { id } = req.params
+    const infoCategory = await CategoryModel.getCategoryById(id)
+    const { name } = req.body
+    const newName = name || infoCategory.name
+    const picture = (req.file && req.file.filename) || null
+    if (idUser === 1) {
+      await CategoryModel.updateCategory(id, newName, picture)
+      res.send(message(true, 'Category updated'))
+    } else {
+      res.send(message(false, 'U cant access this feature'))
+    }
+  },
   createProduct: async function (req, res) {
     if (req.user.roleId === 1) {
       const { idCategory, name, price, stock } = req.body

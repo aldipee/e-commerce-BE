@@ -33,7 +33,9 @@ module.exports = {
   registerUser: async function (req, res) {
     try {
       const { username, password, fullname, email, phone } = req.body
+      const phoneRegex = /^[0]/gs
       if (username && password && fullname && email && phone) {
+        const newPhone = phone.replace(phoneRegex, '+62')
         const checkUser = await UserModel.checkUsername(username)
         if (checkUser !== 0) {
           res.send(message(false, 'Username already exists'))
@@ -45,7 +47,7 @@ module.exports = {
             email
           )
           const infoUser = await UserModel.getUserByUsername(username)
-          await UserDetailModel.createUserDetail(infoUser.id, fullname, phone)
+          await UserDetailModel.createUserDetail(infoUser.id, fullname, newPhone)
           console.log(infoUser)
           if (resultUser) {
             const verCode = uuid()
@@ -160,7 +162,7 @@ module.exports = {
           const resetCode = await UserModel.getVerificationCode(userInfo.username)
           if (resetCode) {
             // Uncomment below this for sending SMS
-            // SMS.sendSMS(resetCode.verification_code, userDetail.phone)
+            SMS.sendSMS(resetCode.verification_code, userDetail.phone)
             res.send(message(true, `Reset code : ${resetCode.verification_code}`))
           } else {
             res.send(message(false, 'Reset code can\'t generate'))
@@ -213,8 +215,6 @@ module.exports = {
     } else {
       res.send(message(false, 'Profile cant updated'))
     }
-
-    res.send(infoUser)
   },
   updatePict: async function (req, res) {
     const id = req.user.id
@@ -272,7 +272,7 @@ module.exports = {
         const street = JSON.stringify(infoAddress[0].street)
         const newDate = date.substring(1, 11)
         const dataInvoice = Invoice.mailInvoice(infoTransaction.invoice_number, newDate, street, infoUserDetail.full_name, email, infoTransactionDetail, infoTransaction.total_price)
-        Mail.sendMail(email, 'INVOICE', dataInvoice)
+        Mail.sendMail(email, '[INVOICE]', dataInvoice)
       } else {
         res.send(message(false, 'Please top up your balance', newBalance))
       }
@@ -292,14 +292,39 @@ module.exports = {
     // const value = sort && Object.values(sort)[0]
     sort = (sort && { key, value }) || { key: 'price', value: 1 }
     const conditions = { page, perPage: limit, search, sort }
-    const results = await ProductModel.getAllProducts(conditions)
-    conditions.totalData = await ProductModel.getTotalProducts(conditions)
-    conditions.totalPage = Math.ceil(conditions.totalData / conditions.perPage)
-    delete conditions.search
-    delete conditions.sort
-    delete conditions.limit
-    const data = { data: results, pageInfo: conditions }
-    res.send(message(true, 'true', data))
+    // res.send(message(true, 'true', data))
+    const fetchTradeDetail = async () => {
+      const results = await ProductModel.getAllProducts(conditions)
+      // console.log(results)
+      conditions.totalData = await ProductModel.getTotalProducts(conditions)
+      conditions.totalPage = Math.ceil(conditions.totalData / conditions.perPage)
+      delete conditions.search
+      delete conditions.sort
+      delete conditions.limit
+      // const data = { data: results, pageInfo: conditions }
+      if (results.length) {
+        const promisess = results.map(async obj => {
+          const infoSoldProduct = await TransactionDetailModel.countSoldProduct(
+            obj.idProduct
+          )
+          console.log(infoSoldProduct)
+          return { ...obj, soldProduct: Object.values(infoSoldProduct) }
+        })
+        const promiseDone = Promise.all(promisess)
+        return promiseDone
+      } else {
+        res.send(message(false, 'You dont have any Transaction', results))
+      }
+    }
+    // function end
+    fetchTradeDetail()
+      .then(data => {
+        const finalData = { data: data, pageInfo: conditions }
+        res.send(message(true, 'List Product', finalData))
+      })
+      .catch(err => {
+        console.log(err)
+      })
   },
   getProductByCategory: async function (req, res) {
     let { page, limit, search, sort } = req.query
@@ -343,7 +368,7 @@ module.exports = {
       search = (search && { key: search.key, value: search.value }) || { key: 'receipt_number', value: '' }
       sort = (sort && { key: sort.key, value: sort.value }) || { key: 'id', value: 1 }
       const conditions = { page, perPage: limit, search, sort }
-      console.log(conditions)
+      // console.log(conditions)
       const fetchTradeDetail = async () => {
         const results = await TransactionModel.getTransactionByUser(id, conditions)
         conditions.totalData = await TransactionModel.getTotalTransactionByUser(id, conditions)

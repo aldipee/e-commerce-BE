@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 7000 },
+  limits: { fileSize: 7000000 },
   fileFilter: function (req, file, callbck) {
     fileCheck(file, callbck)
   }
@@ -50,5 +50,6 @@ function filterPicture (req, res, next) {
 // item
 item.post('/category', filterPicture, MidToken.checkToken, AdminControl.createCategory)
 item.patch('/category/:id', MidToken.checkToken, AdminControl.deleteCategory)
+item.patch('/update/category/:id', filterPicture, MidToken.checkToken, AdminControl.updateCategory)
 
 module.exports = item

@@ -16,7 +16,7 @@ module.exports = {
     const mailOptions = {
       from: useremail, // sender address
       to: `${sendTo}`, // list of receivers
-      subject: `[${subject}]`, // Subject line
+      subject: `${subject}`, // Subject line
       html: `${bodyEmail}`// plain text body
     }
 

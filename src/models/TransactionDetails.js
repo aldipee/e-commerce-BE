@@ -43,5 +43,18 @@ module.exports = {
         }
       })
     })
+  },
+  countSoldProduct: function (idProduct) {
+    const query = `SELECT SUM(quantity) FROM transaction_details where id_product= ${idProduct}`
+    console.log(query)
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results[0])
+        }
+      })
+    })
   }
 }

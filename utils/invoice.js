@@ -1,7 +1,9 @@
 require('dotenv').config()
+const logo = process.env.LOGO_URL
 module.exports = {
   mailInvoice: function (invoice, date, address, name, email, data, totalPrice) {
     console.log(data)
+    // const listData = data.map(n => '<td>' + data + '</td>')
     let detail = '<tr class="item">'
     for (let i = 0; i <= data.length; i++) {
       detail += `<td id ="item">${data.price}</td>`
@@ -116,7 +118,7 @@ module.exports = {
                         <table>
                             <tr>
                                 <td class="title">
-                                    <img src="http://157.230.243.211:3030/public/image/logo.png" style="width:100%; max-width:300px;">
+                                    <img src="${logo}" style="width:100%; max-width:300px;">
                                 </td>
                                 
                                 <td>
