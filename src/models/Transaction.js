@@ -50,8 +50,9 @@ module.exports = {
     const { page, perPage, sort, search } = conditions
     const query = `SELECT * FROM ${table}  
                   WHERE ${search.key} LIKE '${search.value}%' AND id_user = ${idUser}
-                  ORDER BY ${sort.key} ${sort.value ? 'ASC' : 'DESC'} 
+                  ORDER BY ${sort.key} ${parseInt(sort.value) ? 'ASC' : 'DESC'} 
                   LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
+    console.log(query)
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {

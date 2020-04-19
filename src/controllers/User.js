@@ -308,8 +308,9 @@ module.exports = {
       page = parseInt(page) || 1
       limit = parseInt(limit) || 5
       search = (search && { key: search.key, value: search.value }) || { key: 'receipt_number', value: '' }
-      sort = (sort && { key, value }) || { key: 'created_at', value: 1 }
+      sort = (sort && { key: sort.key, value: sort.value }) || { key: 'id', value: 1 }
       const conditions = { page, perPage: limit, search, sort }
+      console.log(conditions)
       const fetchTradeDetail = async () => {
         const results = await TransactionModel.getTransactionByUser(id, conditions)
         conditions.totalData = await TransactionModel.getTotalTransactionByUser(id, conditions)
