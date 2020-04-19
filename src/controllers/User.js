@@ -148,12 +148,13 @@ module.exports = {
     if (username) {
       if (await UserModel.checkUsername(username)) {
         const userInfo = await UserModel.getUserByUsername(username)
-        // const userDetail = await UserDetailModel.getUserDetail(userInfo.id)
+        const userDetail = await UserDetailModel.getUserDetail(userInfo.id)
         if (userInfo.is_registered === 1) {
-          await UserModel.createVerificationCode(userInfo.id, uuid())
+          const code = uuid().substring(0, 4)
+          await UserModel.createVerificationCode(userInfo.id, code)
           const resetCode = await UserModel.getVerificationCode(userInfo.username)
           if (resetCode) {
-            // SMS.sendSMS(resetCode.verification_code, userDetail.phone)
+            SMS.sendSMS(resetCode.verification_code, userDetail.phone)
             res.send(message(true, `Reset code : ${resetCode.verification_code}`))
           } else {
             res.send(message(false, 'Reset code can\'t generate'))
