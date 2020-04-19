@@ -52,7 +52,6 @@ module.exports = {
                   WHERE ${search.key} LIKE '${search.value}%' AND id_user = ${idUser}
                   ORDER BY ${sort.key} ${parseInt(sort.value) ? 'ASC' : 'DESC'} 
                   LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
-    console.log(query)
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {
@@ -63,14 +62,18 @@ module.exports = {
       })
     })
   },
-  // getTransactionById: function (idTransaction) {
-  //   const query = `SELECT * FROM ${table} WHERE id = ${idTransaction}`
-  //   return new Promise(function (resolve, reject) {
-  //     db,query(query, function( err, results, fields) {
-
-  //     })
-  //   })
-  // }
+  getTransactionById: function (idTransaction) {
+    const query = `SELECT * FROM ${table} WHERE id = ${idTransaction}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results[0])
+        }
+      })
+    })
+  },
   getTotalTransactionByUser: function (idUser, conditions = {}) {
     let { search } = conditions
     search = search || { key: 'id', value: '' }

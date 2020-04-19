@@ -54,5 +54,6 @@ product.post('/create', MidToken.checkToken, filterPicture, AdminControl.createP
 product.post('/create/:idProduct/detail', MidToken.checkToken, AdminControl.createProductDetail)
 
 product.get('/all', UserControl.getAllProduct)
+product.get('/category/:id', UserControl.getProductByCategory)
 
 module.exports = product

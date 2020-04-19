@@ -98,18 +98,16 @@ module.exports = {
       const checkUser = await UserModel.checkUsername(username)
       if (checkUser) {
         const infoUser = await UserModel.getUserByUsername(username)
-        // console.log(infoUser)
-        // console.log(infoUser.password)
-        // console.log(password)
         const checkPassword = bcrypt.compareSync(password, infoUser.password)
-        console.log(checkPassword)
+        // console.log(checkPassword)
         const checkRegistered = await UserModel.checkRegistered(username)
         if (checkRegistered) {
           if (checkPassword) {
             const payload = {
               id: infoUser.id,
               username,
-              roleId: infoUser.role_id
+              roleId: infoUser.role_id,
+              email: infoUser.email
             }
             const options = { expiresIn: '1d' }
             const key = process.env.APP_KEY
@@ -237,7 +235,9 @@ module.exports = {
   },
   createTransaction: async function (req, res) {
     try {
+      console.log(req.user)
       const id = req.user.id
+      const email = req.user.email
       const invoiceNumber = uuid()
       const newInvoiceNumber = invoiceNumber.substring(0, 8)
       const { totalPrice, postalFee, Product } = req.body
@@ -258,10 +258,21 @@ module.exports = {
         }
         insertDataProducts().then((data) => {
         })
-        const infoTransaction = await TransactionModel
+        const infoTransaction = await TransactionModel.getTransactionById(idTrans)
+        const infoUserDetail = await UserDetailModel.getUserDetail(infoTransaction.id_user)
         const infoTransactionDetail = await TransactionDetailModel.getTransactionJoinProduct(idTrans)
-        res.send(message(true, infoTransactionDetail))
-        
+        const infoAddress = await AddressModel.getByidUserDetail(infoUserDetail.id)
+        // console.log(infoUserDetail)
+        const data = {
+          infoTransactionDetail,
+          newBalance
+        }
+        res.send(message(true, data))
+        const date = JSON.stringify(infoTransaction.created_at)
+        const street = JSON.stringify(infoAddress[0].street)
+        const newDate = date.substring(1, 11)
+        const dataInvoice = Invoice.mailInvoice(infoTransaction.invoice_number, newDate, street, infoUserDetail.full_name, email, infoTransactionDetail, infoTransaction.total_price)
+        Mail.sendMail(email, 'INVOICE', dataInvoice)
       } else {
         res.send(message(false, 'Please top up your balance', newBalance))
       }
@@ -290,14 +301,36 @@ module.exports = {
     const data = { data: results, pageInfo: conditions }
     res.send(message(true, 'true', data))
   },
+  getProductByCategory: async function (req, res) {
+    let { page, limit, search, sort } = req.query
+    const { id } = req.params
+    page = parseInt(page) || 1
+    limit = parseInt(limit) || 5
+    search = (search && { key: search.key, value: search.value }) || { key: 'id_category', value: '' }
+    sort = (sort && { key, value }) || { key: 'price', value: 1 }
+    const conditions = { page, perPage: limit, search, sort }
+    const infoProduct = await ProductModel.getProductByCategory(id)
+    conditions.totalData = await ProductModel.getTotalProducts(conditions)
+    conditions.totalPage = Math.ceil(conditions.totalData / conditions.perPage)
+    delete conditions.search
+    delete conditions.sort
+    delete conditions.limit
+    if (infoProduct) {
+      const data = { data: infoProduct, pageInfo: conditions }
+      res.send(message(true, 'Total product', data))
+    } else {
+      res.send(message(false, 'Total product', data))
+    }
+  },
   getProfileDetail: async function (req, res) {
     const id = req.user.id
+    console.log(req.user)
     const infoDetail = await UserModel.ProfileDetail(id)
-    console.log(infoDetail)
+    // console.log(infoDetail)
     const userDetail = await UserDetailModel.getUserDetail(id)
-    console.log(userDetail)
+    // console.log(userDetail)
     const address = await AddressModel.getByidUserDetail(userDetail.id)
-    console.log(address)
+    // console.log(address)
     infoDetail.address = address
     res.send(message(true, infoDetail))
   },

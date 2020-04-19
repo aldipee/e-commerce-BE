@@ -59,6 +59,18 @@ module.exports = {
       })
     })
   },
+  getProductByCategory: function (idCategory) {
+    const query = `SELECT * FROM ${table} WHERE id_category = ${idCategory}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results)
+        }
+      })
+    })
+  },
   checkStock: function (idProduct) {
     const query = `SELECT * FROM ${table} WHERE id=${idProduct}`
     return new Promise(function (resolve, reject) {
