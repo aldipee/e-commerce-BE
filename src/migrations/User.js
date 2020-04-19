@@ -1,6 +1,6 @@
 require('dotenv').config()
 const bcrypt = require('bcryptjs')
-password = process.env.PASSWORD
+const password = process.env.PASSWORD
 const encryptPass = bcrypt.hashSync(password)
 
 const db = require('../../utils/db')
