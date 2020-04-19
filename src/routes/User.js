@@ -50,7 +50,7 @@ function filterPicture (req, res, next) {
 
 // auth
 User.post('/register', UserControl.registerUser)
-User.post('/activate', UserControl.activateUser)
+User.get('/activate', UserControl.activateUser)
 User.post('/login', UserControl.login)
 User.post('/username-check', UserControl.usernameCheck)
 User.post('/forgot', UserControl.forgetPass)

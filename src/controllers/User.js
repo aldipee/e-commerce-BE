@@ -51,9 +51,9 @@ module.exports = {
             if (await UserModel.createVerificationCode(infoUser.id, verCode)) {
               const code = await UserModel.getVerificationCode(username)
               // uncomment below this for sending email when registration
-              // const path = process.env.ACTIVATION_PATH
-              // const bodyEmail = `<p>Click this <a href='${path}';>link<a/> for activate your account, or inser this code : ${verCode}</p>`
-              // Mail.sendMail(email, 'ACTIVATION_CODE', bodyEmail)
+              const path = process.env.ACTIVATION_PATH.concat(`username=${username}&verifyCode=${verCode}`)
+              const bodyEmail = `<p>Click this <a href='${path}';>link<a/> for activate your account, or inser this code : ${verCode}</p>`
+              Mail.sendMail(email, 'ACTIVATION_CODE', bodyEmail)
               res.send(
                 message(true, `Verification code: ${code.verification_code}`)
               )
@@ -81,7 +81,8 @@ module.exports = {
       } else {
         const result = await UserModel.activateUser(username, verifyCode)
         if (result) {
-          res.redirect('goldenfoot://people')
+          // res.redirect('goldenfoot://people')
+          res.send(message(true, 'account activated'))
         } else {
           res.send(message(false, 'verifyCode not valid'))
         }
@@ -159,7 +160,8 @@ module.exports = {
           await UserModel.createVerificationCode(userInfo.id, code)
           const resetCode = await UserModel.getVerificationCode(userInfo.username)
           if (resetCode) {
-            SMS.sendSMS(resetCode.verification_code, userDetail.phone)
+            // Uncomment below this for sending SMS
+            // SMS.sendSMS(resetCode.verification_code, userDetail.phone)
             res.send(message(true, `Reset code : ${resetCode.verification_code}`))
           } else {
             res.send(message(false, 'Reset code can\'t generate'))
@@ -183,6 +185,7 @@ module.exports = {
         if (password === confirmPass) {
           const encryptPass = bcrypt.hashSync(password)
           if (await UserModel.forgotPassword(resetCode, encryptPass)) {
+            await UserModel.deleteCode(username)
             res.send(message(true, 'Password has changed'))
           } else {
             res.send(message(false, 'failed to change password'))

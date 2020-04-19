@@ -99,6 +99,22 @@ module.exports = {
       })
     })
   },
+  deleteCode: async function (username) {
+    const query = `UPDATE ${table} SET verification_code = NULL where username = '${username}'`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.length) {
+            resolve(results[0])
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
+  },
   activateUser: async function (username, code) {
     const table = 'users'
     const checkUser = await this.checkUsername(username)
