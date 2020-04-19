@@ -81,7 +81,7 @@ module.exports = {
       } else {
         const result = await UserModel.activateUser(username, verifyCode)
         if (result) {
-          res.send(message(true, 'Account has been activate'))
+          res.redirect('goldenfoot://people')
         } else {
           res.send(message(false, 'verifyCode not valid'))
         }
