@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const uuid = require('uuid').v4
+require('dotenv').config()
 
 const UserModel = require('../models/User')
 const UserDetailModel = require('../models/UserDetail')
@@ -46,9 +47,12 @@ module.exports = {
           await UserDetailModel.createUserDetail(infoUser.id, fullname, phone)
           console.log(infoUser)
           if (resultUser) {
-            if (await UserModel.createVerificationCode(infoUser.id, uuid())) {
+            const verCode = uuid()
+            if (await UserModel.createVerificationCode(infoUser.id, verCode)) {
               const code = await UserModel.getVerificationCode(username)
-              Mail.sendMail(email, code.verification_code)
+              // uncomment below this for sending email when registration
+              // const path = process.env.ACTIVATION_PATH
+              // Mail.sendMail(email, code.verification_code, path)
               res.send(
                 message(true, `Verification code: ${code.verification_code}`)
               )
@@ -112,7 +116,7 @@ module.exports = {
             res.send(message(false, 'Wrong password !'))
           }
         } else {
-          res.send(message(false, 'Register first'))
+          res.send(message(false, 'Register and activate your account first'))
         }
       } else {
         res.send(message(false, 'Username not found'))
