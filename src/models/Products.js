@@ -111,5 +111,37 @@ module.exports = {
         }
       })
     })
+  },
+  updateProduct: function (id, isDeleted) {
+    const query = `UPDATE ${table} SET is_deleted = ${isDeleted} WHERE id = ${id}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.affectedRows) {
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
+  },
+  updateStockProduct: function (id, stock) {
+    const query = `UPDATE ${table} SET stock = ${stock} WHERE id = ${id}`
+    return new Promise(function (resolve, reject) {
+      db.query(query, function (err, results, fields) {
+        if (err) {
+          reject(err)
+        } else {
+          if (results.affectedRows) {
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
   }
 }

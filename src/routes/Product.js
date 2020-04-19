@@ -56,4 +56,7 @@ product.post('/create/:idProduct/detail', MidToken.checkToken, AdminControl.crea
 product.get('/all', UserControl.getAllProduct)
 product.get('/category/:id', UserControl.getProductByCategory)
 
+product.patch('/update/:id', MidToken.checkToken, AdminControl.updateProductStatus)
+product.patch('/stock/update/:id', MidToken.checkToken, AdminControl.updateProductStock)
+
 module.exports = product

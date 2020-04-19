@@ -152,5 +152,33 @@ module.exports = {
     } else {
       res.send(message(false, 'U cant access this feature'))
     }
+  },
+  updateProductStatus: async function (req, res) {
+    const role = req.user.roleId
+    const { id } = req.params
+    const { isDeleted } = req.body
+    if (role === 1) {
+      if (await ProductModel.updateProduct(id, isDeleted)) {
+        res.send(message(true, 'Product is_deleted updated'))
+      } else {
+        res.send(message(false, 'Unable to updated, id product not found'))
+      }
+    } else {
+      res.send(message(false, 'U cant access this feature'))
+    }
+  },
+  updateProductStock: async function (req, res) {
+    const { id } = req.params
+    const role = req.user.roleId
+    const { stock } = req.body
+    if (role === 1) {
+      if (await ProductModel.updateStockProduct(stock, id)) {
+        res.send(message(true, `Stock product with id ${id} updated`))
+      } else {
+        res.send(message(false, 'Product not found'))
+      }
+    } else {
+      res.send(message(false, 'U cant access this feature'))
+    }
   }
 }
