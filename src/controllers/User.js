@@ -247,6 +247,7 @@ module.exports = {
       if (newBalance > 0) {
         await UserDetailModel.updateBalance(id, newBalance)
         const idTrans = await TransactionModel.createTransaction(id, totalPrice, postalFee, newInvoiceNumber)
+        // console.log('IdTrans is : ', idTrans)
         await TransactionModel.updateStatusTransaction(idTrans, 1)
         const insertDataProducts = async () => {
           const insert = Product.map(async data => {
@@ -259,6 +260,7 @@ module.exports = {
         insertDataProducts().then((data) => {
         })
         const infoTransaction = await TransactionModel.getTransactionById(idTrans)
+        // console.log(infoTransaction)
         const infoUserDetail = await UserDetailModel.getUserDetail(infoTransaction.id_user)
         const infoTransactionDetail = await TransactionDetailModel.getTransactionJoinProduct(idTrans)
         const infoAddress = await AddressModel.getByidUserDetail(infoUserDetail.id)
@@ -268,10 +270,12 @@ module.exports = {
           newBalance
         }
         res.send(message(true, data))
-        const date = JSON.stringify(infoTransaction.created_at)
+        // const date = JSON.stringify(infoTransaction.created_at)
+        const date = infoTransaction.created_at.toUTCString()
         const street = JSON.stringify(infoAddress[0].street)
-        const newDate = date.substring(1, 11)
+        const newDate = date.substring(0, 17)
         const dataInvoice = Invoice.mailInvoice(infoTransaction.invoice_number, newDate, street, infoUserDetail.full_name, email, infoTransactionDetail, infoTransaction.total_price)
+        // console.log(newDate)
         Mail.sendMail(email, '[INVOICE]', dataInvoice)
       } else {
         res.send(message(false, 'Please top up your balance', newBalance))

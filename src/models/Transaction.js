@@ -4,6 +4,7 @@ const table = 'transactions'
 module.exports = {
   createTransaction: function (idUser, totalPrice, postalFee, invoiceNumber) {
     const query = `INSERT INTO ${table} (id_user, total_price, postal_fee, invoice_number) VALUES (${idUser}, ${totalPrice}, ${postalFee}, '${invoiceNumber}') `
+    console.log(query)
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {
@@ -64,6 +65,7 @@ module.exports = {
   },
   getTransactionById: function (idTransaction) {
     const query = `SELECT * FROM ${table} WHERE id = ${idTransaction}`
+    // console.log(query)
     return new Promise(function (resolve, reject) {
       db.query(query, function (err, results, fields) {
         if (err) {

@@ -2,14 +2,18 @@ require('dotenv').config()
 const logo = process.env.LOGO_URL
 module.exports = {
   mailInvoice: function (invoice, date, address, name, email, data, totalPrice) {
-    console.log(data)
-    // const listData = data.map(n => '<td>' + data + '</td>')
-    let detail = '<tr class="item">'
-    for (let i = 0; i <= data.length; i++) {
-      detail += `<td id ="item">${data.price}</td>`
-      // console.log(data)
-    }
-    detail += '</tr>'
+    console.log(data[0].price, data[0].quantity, data[0].name)
+    const item = data.map(n => ('<tr class="item"><td>' + n.name + '</td>' +
+                                '<td>' + n.quantity + '</td>' +
+                                '<td>' + n.price + '</td></tr>')).join(' ')
+    console.log(item)
+    // console.log(listData)
+    // let detail = '<tr class="item">'
+    // for (let i = 0; i <= data.length; i++) {
+    //   detail += `<td id ="item">${data.price}</td>`
+    //   // console.log(data)
+    // }
+    // detail += '</tr>'
     const html = `<!doctype html>
     <html>
     <head>
@@ -150,19 +154,14 @@ module.exports = {
                     <td>
                         Item
                     </td>
-                    
+                    <td>
+                      Quantity
+                    </td>
                     <td>
                         Price
                     </td>
                 </tr>
-                ${detail}
-                <tr class="total">
-                    <td></td>
-                    
-                    <td>
-                      Total: ${totalPrice}
-                    </td>
-                </tr>
+                ${item}
             </table>
         </div>
     </body>
