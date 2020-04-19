@@ -1,5 +1,5 @@
 module.exports = {
-  mailInvoice: function (date, invoiceNumber, user) {
+  mailInvoice: function (invoice, date, address, name, email, data, totalPrice) {
 `<!doctype html>
       <html>
       <head>
@@ -147,40 +147,15 @@ module.exports = {
                   </tr>
                   
                   <tr class="item">
-                      <td>
-                          ${productName}
+                      <td id ="item">
+                          ${data}
                       </td>
-                      
-                      <td>
-                          $300.00
-                      </td>
-                  </tr>
-                  
-                  <tr class="item">
-                      <td>
-                          Hosting (3 months)
-                      </td>
-                      
-                      <td>
-                          $75.00
-                      </td>
-                  </tr>
-                  
-                  <tr class="item last">
-                      <td>
-                          Domain name (1 year)
-                      </td>
-                      
-                      <td>
-                          $10.00
-                      </td>
-                  </tr>
-                  
+                  </tr>                  
                   <tr class="total">
                       <td></td>
                       
                       <td>
-                        Total: $385.00
+                        Total: ${totalPrice}
                       </td>
                   </tr>
               </table>

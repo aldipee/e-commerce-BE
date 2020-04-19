@@ -257,8 +257,11 @@ module.exports = {
           return PromiseDone
         }
         insertDataProducts().then((data) => {
-          res.send(message(true, 'transaction success', newBalance))
         })
+        const infoTransaction = await TransactionModel
+        const infoTransactionDetail = await TransactionDetailModel.getTransactionJoinProduct(idTrans)
+        res.send(message(true, infoTransactionDetail))
+        
       } else {
         res.send(message(false, 'Please top up your balance', newBalance))
       }
@@ -316,7 +319,7 @@ module.exports = {
         delete conditions.limit
         if (results.length) {
           const promisess = results.map(async obj => {
-            const infoTradeDetail = await TransactionDetailModel.getTransactionDetailsByIdTransaction(
+            const infoTradeDetail = await TransactionDetailModel.getTransactionJoinProduct(
               obj.id
             )
             return { ...obj, transactionDetail: infoTradeDetail }

@@ -62,6 +62,14 @@ module.exports = {
       })
     })
   },
+  // getTransactionById: function (idTransaction) {
+  //   const query = `SELECT * FROM ${table} WHERE id = ${idTransaction}`
+  //   return new Promise(function (resolve, reject) {
+  //     db,query(query, function( err, results, fields) {
+
+  //     })
+  //   })
+  // }
   getTotalTransactionByUser: function (idUser, conditions = {}) {
     let { search } = conditions
     search = search || { key: 'id', value: '' }
