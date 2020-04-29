@@ -11,17 +11,17 @@ const storage = multer.diskStorage({
   destination: 'files/',
   filename: function (req, file, callbck) {
     callbck(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-  }
+  },
 })
 const upload = multer({
   storage: storage,
   limits: { fileSize: 1000000000 },
   fileFilter: function (req, file, callbck) {
     fileCheck(file, callbck)
-  }
+  },
 }).single('picture')
 
-function fileCheck (file, callbck) {
+function fileCheck(file, callbck) {
   const typeFile = /jpeg|jpg|png|gif/
   const extName = typeFile.test(path.extname(file.originalname).toLowerCase())
   console.log(extName)
@@ -34,7 +34,7 @@ function fileCheck (file, callbck) {
   }
 }
 
-function filterPicture (req, res, next) {
+function filterPicture(req, res, next) {
   upload(req, res, function (err) {
     if (err) {
       res.send('Error: File too large')
@@ -60,8 +60,8 @@ User.post('/email-check', UserControl.emailCheck)
 User.post('/insert-address', MidToken.checkToken, UserControl.addAddress)
 
 User.patch('/update-personal', MidToken.checkToken, UserControl.updatePersonal)
-User.put('/update-pic', MidToken.checkToken, filterPicture, UserControl.updatePict)
-// User.patch('/topup/:id', MidToken.checkToken, AdminControl.updateSaldo)
+User.post('/update-pic', MidToken.checkToken, filterPicture, UserControl.updatePict)
+User.patch('/topup/:id', MidToken.checkToken, AdminControl.updateSaldo)
 
 User.get('/detail', MidToken.checkToken, UserControl.getProfileDetail)
 
