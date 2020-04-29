@@ -18,6 +18,7 @@ module.exports = {
       const query = `SELECT COUNT (*) AS total FROM ${table} WHERE username ='${username}'`
       db.query(query, function (err, results, fields) {
         if (err) {
+          console.log(err)
           reject(err)
         } else {
           resolve(results[0].total)
@@ -164,7 +165,11 @@ module.exports = {
     })
     if (await checkUser) {
       return new Promise(function (resolve, reject) {
-        db.query(`UPDATE ${table} SET password='${newPassword}' WHERE verification_code='${uuid}'`, function (err, results, fields) {
+        db.query(`UPDATE ${table} SET password='${newPassword}' WHERE verification_code='${uuid}'`, function (
+          err,
+          results,
+          fields
+        ) {
           console.log('a')
           if (err) {
             reject(err)
@@ -193,5 +198,5 @@ module.exports = {
         }
       })
     })
-  }
+  },
 }

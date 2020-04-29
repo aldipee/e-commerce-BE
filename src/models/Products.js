@@ -27,11 +27,14 @@ module.exports = {
     })
   },
   getAllProducts: function (conditions) {
-    const { page, perPage, sort, search } = conditions
+    const { page, perPage, sort, search, minPrice, maxPrice } = conditions
+
     return new Promise(function (resolve, reject) {
       const sql = `SELECT categories.id as idCategory, products.id as idProduct, categories.name as categoryName, categories.thumbnail, products.name, products.price, products.picture, products.stock
                   FROM ${table} INNER JOIN categories ON categories.id = products.id_category
-                  WHERE ${search.key} LIKE '${search.value}%' AND products.stock != 0
+                  WHERE ${search.key} LIKE '${search.value}%' AND products.stock != 0 ${
+        parseInt(maxPrice) ? `AND products.price BETWEEN ${minPrice} AND ${maxPrice}` : ''
+      }
                   ORDER BY ${sort.key} ${sort.value ? 'ASC' : 'DESC'} 
                    LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
       console.log(sql)
@@ -143,5 +146,5 @@ module.exports = {
         }
       })
     })
-  }
+  },
 }
