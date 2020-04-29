@@ -4,6 +4,7 @@ const ProductModel = require('../models/Products')
 const ProductDetail = require('../models/ProductDetails')
 const TransactionModel = require('../models/Transaction')
 const UserDetailModel = require('../models/UserDetail')
+const Topup = require('../models/Topup')
 function message (success, msg, data) {
   if (data) {
     return {
@@ -186,24 +187,51 @@ module.exports = {
     try {
       const role = req.user.roleId
       const { id } = req.params
-      const { balance } = req.body
       if (role === 1) {
-        if (await UserDetailModel.getUserDetail(id)) {
-          if (balance) {
-            await UserDetailModel.topupBalance(id, balance)
-            res.send(message(true, 'Topup succesfull'))
-          } else {
-            res.send(message(false, 'Please fill the balance field'))
-          }
+        const infoTopUp = await Topup.getTopupById(id)
+        if (infoTopUp) {
+        const nominal = infoTopUp.nominal
+        const idUser = infoTopUp.id_user
+        await Topup.updateStatus(idUser, 1)
+        await UserDetailModel.topupBalance(idUser, nominal)
+        res.status(200).send(message(true, 'Top up success'))
         } else {
-          res.send(message(false, 'Id user not found'))
-        }  
+          res.status(200).send(message(true, 'Id top up not found'))
+        }
       } else {
         res.send(message(false, 'U cant access this feature'))
       }
 
     } catch (err) {
       res.send(message(false, err))
+    }
+  },
+  getAllTopup : async function (req, res) {
+    const role = req.user.roleId
+    let {page, limit, search, sort} = req.query
+    page = parseInt(page) || 1
+    limit = parseInt(limit) || 5
+    search = (search && { key: search.key, value: search.value }) || { key: 'status', value: '' }
+    sort = (sort && { key, value }) || { key: 'id', value: 1 }
+    const conditions = { page, perPage: limit, search, sort }
+    if (role === 1) {
+      const result = await Topup.getAllTopup(conditions)
+      conditions.totalData = await Topup.getTotalTopup(conditions)
+      conditions.totalPage = Math.ceil(conditions.totalData / conditions.perPage)
+      delete conditions.search
+      delete conditions.sort
+      delete conditions.limit
+      const data = {
+        TopupData : result,
+        PageInfo : conditions
+      }
+      if (result) {
+        res.status(200).send(message(true, 'List of transactions', data))
+      } else {
+        res.status(200).send(message(true, 'There is no transaction', data))
+      }
+    } else {
+      res.status(200).send(message(false, 'You cant access this feature'))
     }
   }
 }

@@ -13,6 +13,7 @@ var user = require('./src/routes/User')
 var item = require('./src/routes/Item')
 var product = require('./src/routes/Product')
 var transaction = require('./src/routes/Transactions')
+var topup = require('./src/routes/Topup')
 
 var app = express()
 
@@ -29,6 +30,7 @@ app.use('/item', item)
 app.use('/auth', user)
 app.use('/product', product)
 app.use('/transactions', transaction)
+app.use('/topup', topup)
 app.use('/migrate', function (req, res) {
   require('./src/migrations/Roles')
   require('./src/migrations/User')

@@ -10,6 +10,7 @@ const TransactionDetailModel = require('../models/TransactionDetails')
 const ProductModel = require('../models/Products')
 const ProductDetailModel = require('../models/ProductDetails')
 const AddressModel = require('../models/Address')
+const Topup = require('../models/Topup')
 const Mail = require('../../utils/sendMail')
 const SMS = require('../../utils/sendSMS')
 const Invoice = require('../../utils/invoice')
@@ -405,5 +406,61 @@ module.exports = {
     } catch (error) {
       console.log(error)
     }
+  },
+  requestTopup: function (req, res) {
+      try {
+        const id = req.user.id
+        const {nominal} = req.body
+        if (nominal >0) {
+          if (Topup.createRequestTopUp(id, nominal)) {
+            res.status(200).send(message(true, 'Request top up successfull'))
+          } else {
+            res.status(500).send(false, 'Request top up failed')
+          }
+        } else {
+          res.status(400).send(message(false,'Nominal can\'t minus'))
+        }
+      } catch (err) {
+        console.log(err)
+      }
+  },
+  getAllTopUp: async function (req, res) {
+    try {
+      const id = req.user.id
+      let { page, limit, sort } = req.query
+      page = parseInt(page) || 1
+      limit = parseInt(limit) || 5
+      sort = (sort && { key: sort.key, value: sort.value }) || { key: 'id', value: 1 }
+      const conditions = { page, perPage: limit, sort }
+      const result = await Topup.getTopupByUser(id, conditions)
+      conditions.totalData = await TransactionModel.getTotalTransactionByUser(id, conditions)
+      conditions.totalPage = Math.ceil(conditions.totalData / conditions.perPage)
+      delete conditions.sort
+      delete conditions.limit
+      if (result) {
+        const data = {
+          result
+        }
+        res.status(200).send(message(true, 'Your top up history', data))
+      } else {
+        res.status(200).send(message(false, 'You dont have any transaction'))
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  },
+  deleteTopUp: async function (req, res) {
+    const idUser = req.user.id
+    const id = req.params
+    if (typeof(id) === 'number') {
+      if (await Topup.checkTopupId(id)) {
+        await Topup.deleteTopup(id, idUser, 1)
+        res.status(200).send(message(true, 'Transaction deleted'))
+      } else {
+        res.status(200).send(message(true, 'transaction not found'))
+      }
+    } else {
+      res.status(500).send(message(false, 'id must be a number'))
+    }    
   }
 }
