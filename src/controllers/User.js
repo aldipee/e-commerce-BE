@@ -14,17 +14,17 @@ const Mail = require('../../utils/sendMail')
 const SMS = require('../../utils/sendSMS')
 const Invoice = require('../../utils/invoice')
 
-function message (success, msg, data) {
+function message(success, msg, data) {
   if (data) {
     return {
       success: success,
       msg: msg,
-      data: data
+      data: data,
     }
   } else {
     return {
       success: success,
-      msg: msg
+      msg: msg,
     }
   }
 }
@@ -41,11 +41,7 @@ module.exports = {
           res.send(message(false, 'Username already exists'))
         } else {
           const encryptPass = bcrypt.hashSync(password)
-          const resultUser = await UserModel.createUser(
-            username,
-            encryptPass,
-            email
-          )
+          const resultUser = await UserModel.createUser(username, encryptPass, email)
           const infoUser = await UserModel.getUserByUsername(username)
           await UserDetailModel.createUserDetail(infoUser.id, fullname, newPhone)
           console.log(infoUser)
@@ -57,9 +53,7 @@ module.exports = {
               const path = process.env.ACTIVATION_PATH.concat(`username=${username}&verifyCode=${verCode}`)
               const bodyEmail = `<p>Click this <a href='${path}';>link<a/> for activate your account, or inser this code : ${verCode}</p>`
               Mail.sendMail(email, 'ACTIVATION_CODE', bodyEmail)
-              res.send(
-                message(true, `Verification code: ${code.verification_code}`)
-              )
+              res.send(message(true, `Verification code: ${code.verification_code}`))
             } else {
               res.send(message(false, 'Verification code cant be generate'))
             }
@@ -109,7 +103,7 @@ module.exports = {
               id: infoUser.id,
               username,
               roleId: infoUser.role_id,
-              email: infoUser.email
+              email: infoUser.email,
             }
             const options = { expiresIn: '1d' }
             const key = process.env.APP_KEY
@@ -165,7 +159,7 @@ module.exports = {
             SMS.sendSMS(resetCode.verification_code, userDetail.phone)
             res.send(message(true, `Reset code : ${resetCode.verification_code}`))
           } else {
-            res.send(message(false, 'Reset code can\'t generate'))
+            res.send(message(false, "Reset code can't generate"))
           }
         } else {
           res.send(message(false, 'active your account first'))
@@ -217,6 +211,7 @@ module.exports = {
     }
   },
   updatePict: async function (req, res) {
+    console.log(req.file)
     const id = req.user.id
     const picture = (req.file && req.file.filename) || null
     await UserDetailModel.updatePicture(picture, id)
@@ -257,8 +252,7 @@ module.exports = {
           const PromiseDone = Promise.all(insert)
           return PromiseDone
         }
-        insertDataProducts().then((data) => {
-        })
+        insertDataProducts().then(data => {})
         const infoTransaction = await TransactionModel.getTransactionById(idTrans)
         // console.log(infoTransaction)
         const infoUserDetail = await UserDetailModel.getUserDetail(infoTransaction.id_user)
@@ -267,14 +261,22 @@ module.exports = {
         // console.log(infoUserDetail)
         const data = {
           infoTransactionDetail,
-          newBalance
+          newBalance,
         }
         res.send(message(true, data))
         // const date = JSON.stringify(infoTransaction.created_at)
         const date = infoTransaction.created_at.toUTCString()
         const street = JSON.stringify(infoAddress[0].street)
         const newDate = date.substring(0, 17)
-        const dataInvoice = Invoice.mailInvoice(infoTransaction.invoice_number, newDate, street, infoUserDetail.full_name, email, infoTransactionDetail, infoTransaction.total_price)
+        const dataInvoice = Invoice.mailInvoice(
+          infoTransaction.invoice_number,
+          newDate,
+          street,
+          infoUserDetail.full_name,
+          email,
+          infoTransactionDetail,
+          infoTransaction.total_price
+        )
         // console.log(newDate)
         Mail.sendMail(email, '[INVOICE]', dataInvoice)
       } else {
@@ -294,8 +296,11 @@ module.exports = {
     search = (search && { key: search.key, value: search.value }) || { key: 'name', value: '' }
     // const key = sort && Object.keys(sort)[0]
     // const value = sort && Object.values(sort)[0]
+    const { key, value } = sort
     sort = (sort && { key, value }) || { key: 'price', value: 1 }
+
     const conditions = { page, perPage: limit, search, sort }
+    console.log(conditions)
     // res.send(message(true, 'true', data))
     const fetchTradeDetail = async () => {
       const results = await ProductModel.getAllProducts(conditions)
@@ -308,9 +313,7 @@ module.exports = {
       // const data = { data: results, pageInfo: conditions }
       if (results.length) {
         const promisess = results.map(async obj => {
-          const infoSoldProduct = await TransactionDetailModel.countSoldProduct(
-            obj.idProduct
-          )
+          const infoSoldProduct = await TransactionDetailModel.countSoldProduct(obj.idProduct)
           console.log(infoSoldProduct)
           return { ...obj, soldProduct: Object.values(infoSoldProduct) }
         })
@@ -382,9 +385,7 @@ module.exports = {
         delete conditions.limit
         if (results.length) {
           const promisess = results.map(async obj => {
-            const infoTradeDetail = await TransactionDetailModel.getTransactionJoinProduct(
-              obj.id
-            )
+            const infoTradeDetail = await TransactionDetailModel.getTransactionJoinProduct(obj.id)
             return { ...obj, transactionDetail: infoTradeDetail }
           })
           const promiseDone = Promise.all(promisess)
@@ -405,5 +406,5 @@ module.exports = {
     } catch (error) {
       console.log(error)
     }
-  }
+  },
 }

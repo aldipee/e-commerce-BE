@@ -32,7 +32,7 @@ module.exports = {
       const sql = `SELECT categories.id as idCategory, products.id as idProduct, categories.name as categoryName, categories.thumbnail, products.name, products.price, products.picture, products.stock
                   FROM ${table} INNER JOIN categories ON categories.id = products.id_category
                   WHERE ${search.key} LIKE '${search.value}%' AND products.stock != 0
-                  ORDER BY ${sort.key} ${sort.value ? 'ASC' : 'DESC'} 
+                  ORDER BY ${sort.key} ${parseInt(sort.value) ? 'ASC' : 'DESC'} 
                    LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
       console.log(sql)
       db.query(sql, function (err, results, fields) {
@@ -143,5 +143,5 @@ module.exports = {
         }
       })
     })
-  }
+  },
 }

@@ -60,7 +60,7 @@ User.post('/email-check', UserControl.emailCheck)
 User.post('/insert-address', MidToken.checkToken, UserControl.addAddress)
 
 User.patch('/update-personal', MidToken.checkToken, UserControl.updatePersonal)
-User.post('/update-pic', MidToken.checkToken, filterPicture, UserControl.updatePict)
+User.put('/update-pic', MidToken.checkToken, filterPicture, UserControl.updatePict)
 User.patch('/topup/:id', MidToken.checkToken, AdminControl.updateSaldo)
 
 User.get('/detail', MidToken.checkToken, UserControl.getProfileDetail)
