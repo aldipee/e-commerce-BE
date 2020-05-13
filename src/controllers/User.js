@@ -49,11 +49,14 @@ module.exports = {
             const verCode = uuid()
             if (await UserModel.createVerificationCode(infoUser.id, verCode)) {
               const code = await UserModel.getVerificationCode(username)
-              // uncomment below this for sending email when registration
-              const path = process.env.ACTIVATION_PATH.concat(`username=${username}&verifyCode=${verCode}`)
-              const bodyEmail = `<p>Click this <a href='${path}';>link<a/> for activate your account, or inser this code : ${verCode}</p>`
-              Mail.sendMail(email, 'ACTIVATION_CODE', bodyEmail)
-              res.send(message(true, `Verification code: ${code.verification_code}`))
+              if (code) {
+                // uncomment below this for sending email when registration
+
+                const path = process.env.ACTIVATION_PATH.concat(`username=${username}&verifyCode=${verCode}`)
+                const bodyEmail = `<p>Click this <a href='${path}';>link<a/> for activate your account, or inser this code : ${verCode}</p>`
+                Mail.sendMail(email, 'ACTIVATION_CODE', bodyEmail)
+                res.send(message(true, `Verification code: ${code.verification_code}`))
+              }
             } else {
               res.send(message(false, 'Verification code cant be generate'))
             }
@@ -78,8 +81,8 @@ module.exports = {
       } else {
         const result = await UserModel.activateUser(username, verifyCode)
         if (result) {
-          // res.redirect('goldenfoot://people')
-          res.send(message(true, 'account activated'))
+          res.redirect('goldenfoot://people/jane')
+          // res.send(message(true, 'account activated'))
         } else {
           res.send(message(false, 'verifyCode not valid'))
         }
@@ -290,14 +293,14 @@ module.exports = {
     let { page, limit, search, sort } = req.query
     page = parseInt(page) || 1
     limit = parseInt(limit) || 5
-
+    console.log(req.query, 'THIS IS QUERY')
     // let key = search && Object.keys(search)[0]
     // let value = search && Object.values(search)[0]
     search = (search && { key: search.key, value: search.value }) || { key: 'name', value: '' }
     // const key = sort && Object.keys(sort)[0]
     // const value = sort && Object.values(sort)[0]
     const { key, value } = sort
-    sort = (sort && { key, value }) || { key: 'price', value: 1 }
+    sort = (sort && { key: key || 'products.id', value }) || { key: 'price', value: 1 }
 
     const conditions = { page, perPage: limit, search, sort }
     console.log(conditions)
