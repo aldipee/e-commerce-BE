@@ -4,17 +4,17 @@ const ProductModel = require('../models/Products')
 const ProductDetail = require('../models/ProductDetails')
 const TransactionModel = require('../models/Transaction')
 const UserDetailModel = require('../models/UserDetail')
-function message (success, msg, data) {
+function message(success, msg, data) {
   if (data) {
     return {
       success: success,
       msg: msg,
-      data: data
+      data: data,
     }
   } else {
     return {
       success: success,
-      msg: msg
+      msg: msg,
     }
   }
 }
@@ -182,6 +182,7 @@ module.exports = {
       res.send(message(false, 'U cant access this feature'))
     }
   },
+
   updateSaldo: async function (req, res) {
     try {
       const role = req.user.roleId
@@ -197,13 +198,36 @@ module.exports = {
           }
         } else {
           res.send(message(false, 'Id user not found'))
-        }  
+        }
       } else {
         res.send(message(false, 'U cant access this feature'))
       }
-
     } catch (err) {
       res.send(message(false, err))
     }
-  }
+  },
+  updateSaldoUser: async function (req, res) {
+    console.log(req.user, req.body)
+    try {
+      const { id, roleId } = req.user
+      const { balance } = req.body
+      if (roleId === 2) {
+        if (await UserDetailModel.getUserDetail(id)) {
+          if (balance) {
+            await UserDetailModel.topupBalance(id, balance)
+            res.send(message(true, 'Topup succesfull'))
+          } else {
+            res.send(message(false, 'Please fill the balance field'))
+          }
+        } else {
+          res.send(message(false, 'Id user not found'))
+        }
+      } else {
+        res.send(message(false, 'U cant access this feature'))
+      }
+    } catch (err) {
+      console.log(err)
+      res.send(message(false, err))
+    }
+  },
 }
