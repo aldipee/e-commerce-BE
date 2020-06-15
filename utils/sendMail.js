@@ -9,15 +9,15 @@ module.exports = {
       service: 'gmail',
       auth: {
         user: useremail,
-        pass: passmail
-      }
+        pass: passmail,
+      },
     })
     // console.log('apaaja', bodyEmail)
     const mailOptions = {
       from: useremail, // sender address
       to: `${sendTo}`, // list of receivers
       subject: `${subject}`, // Subject line
-      html: `${bodyEmail}`// plain text body
+      html: `${bodyEmail}`, // plain text body
     }
 
     transporter.sendMail(mailOptions, function (err, info) {
@@ -27,5 +27,5 @@ module.exports = {
         console.log(info)
       }
     })
-  }
+  },
 }
